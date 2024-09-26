@@ -10,17 +10,37 @@ import jakarta.persistence.Id;
 class Employee {
 
 	private @Id @GeneratedValue Long id;
+	private String jobTitle;
+	private Integer jobYears;
 	private String firstName;
 	private String lastName;
 	private String role;
 
 	Employee() {}
 
-	Employee(String firstName, String lastName, String role) {
+	Employee(String firstName, String lastName, String role, String jobTitle, Integer jobYears) {
 
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.role = role;
+		this.jobTitle = jobTitle;
+		this.jobYears = jobYears;
+	}
+
+	public String getJobTitle() {
+		return jobTitle;
+	}
+
+	public void setJobTitle(String jobTitle) {
+		this.jobTitle = jobTitle;
+	}
+
+	public Integer getJobYears() {
+		return jobYears;
+	}
+
+	public void setJobYears(Integer jobYears) {
+		this.jobYears = jobYears;
 	}
 
 	public String getName() {
@@ -74,18 +94,22 @@ class Employee {
 		if (!(o instanceof Employee))
 			return false;
 		Employee employee = (Employee) o;
-		return Objects.equals(this.id, employee.id) && Objects.equals(this.firstName, employee.firstName)
-				&& Objects.equals(this.lastName, employee.lastName) && Objects.equals(this.role, employee.role);
+		return Objects.equals(this.id, employee.id) && Objects.equals(this.jobTitle, employee.jobTitle)
+				&& Objects.equals(this.jobYears, employee.jobYears)
+				&& Objects.equals(this.firstName, employee.firstName)
+				&& Objects.equals(this.lastName, employee.lastName)
+				&& Objects.equals(this.role, employee.role);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.id, this.firstName, this.lastName, this.role);
+		return Objects.hash(this.id, this.jobTitle, this.jobYears,this.firstName, this.lastName, this.role);
 	}
 
 	@Override
 	public String toString() {
-		return "Employee{" + "id=" + this.id + ", firstName='" + this.firstName + '\'' + ", lastName='" + this.lastName
+		return "Employee{" + "id=" + this.id
+				+ '\'' + "jobTitle=" + this.jobTitle + '\'' + "jobYears=" + this.jobYears +", firstName='" + this.firstName + '\'' + ", lastName='" + this.lastName
 				+ '\'' + ", role='" + this.role + '\'' + '}';
 	}
 }
