@@ -73,3 +73,9 @@ git log --graph --oneline
 git log --pretty=format:"%h - %an, %ar : %s"
 ![img_2.png](imgs/gitlog3.png)
 
+
+Commit to be deleted
+
+![img.png](img.png)
+
+
