@@ -37,7 +37,6 @@ After completing the initial setup and configuration, we created and pushed the 
     git tag -a 1.1.0 3d068d9
     git push origin 1.1.0
 
-...
 
 ### Step 5: Project Enhancements
 Subsequently, a change was made to the project links by adding two new fields to the Employee model. The necessary support for these new fields was also implemented.
@@ -62,20 +61,38 @@ And we created and pushed the new tag with the new minor version
     git tag v1.2.0
     git push origin v1.2.0
 
+### Step 6: Git Log
 
+After all the changes we used different git log commands to view the commit history:
 
-git log --oneline
+To show the information in a compact way
+
+- git log --oneline- 
+
 ![img.png](imgs/gitlog1.png)
 
-git log --graph --oneline
+To show the commits in graph form
+
+     git log --graph --oneline 
+
 ![img_1.png](imgs/gitlog2.png)
 
-git log --pretty=format:"%h - %an, %ar : %s"
+To show the commit in a formatter way with the id of the commit, name of who commited, time it was done and the name of the commit
+
+    git log --pretty=format:"%h - %an, %ar : %s"
+
 ![img_2.png](imgs/gitlog3.png)
 
+To test the revert command
 
-Commit to be deleted
+### Step 7: Git Revert
+
+To test the revert command we created a commit (only adding on new line in a file) so we could revert to it
 
 ![img.png](img.png)
 
+After that we reverted to that commit with the following command
 
+    git revert 5f3040778133cc7ca2e7e715bb30e8c6aeafda73
+
+![img_1.png](imgs/git_revert.png)
