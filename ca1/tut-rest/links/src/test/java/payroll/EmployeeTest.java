@@ -10,7 +10,7 @@ class EmployeeTest {
 
     @BeforeEach
     void setUp() {
-        employee = new Employee("John", "Doe", "Developer", "Software Engineer", 5);
+        employee = new Employee("John", "Doe","john.doe@gmail.com", "Developer", "Software Engineer", 5);
     }
 
     @Test
@@ -70,14 +70,14 @@ class EmployeeTest {
 
     @Test
     void testEqualsDifferentObjectSameValues() {
-        Employee employee2 = new Employee("John", "Doe", "Developer", "Software Engineer", 5);
+        Employee employee2 = new Employee("John", "Doe","john.doe@gmail.com", "Developer", "Software Engineer", 5);
         employee2.setId(employee.getId());
         assertTrue(employee.equals(employee2));
     }
 
     @Test
     void testEqualsDifferentObjectDifferentValues() {
-        Employee employee2 = new Employee("Jane", "Smith", "Manager", "Lead Engineer", 10);
+        Employee employee2 = new Employee("Jane", "Smith","jane.smith@gmail.com", "Manager", "Lead Engineer", 10);
         assertFalse(employee.equals(employee2));
     }
 
@@ -98,14 +98,14 @@ class EmployeeTest {
 
     @Test
     void testHashCodeDifferentObjectSameValues() {
-        Employee employee2 = new Employee("John", "Doe", "Developer", "Software Engineer", 5);
+        Employee employee2 = new Employee("John", "Doe","john.doe@gmail.com", "Developer", "Software Engineer", 5);
         employee2.setId(employee.getId());
         assertEquals(employee.hashCode(), employee2.hashCode());
     }
 
     @Test
     void testHashCodeDifferentObjectDifferentValues() {
-        Employee employee2 = new Employee("Jane", "Smith", "Manager", "Lead Engineer", 10);
+        Employee employee2 = new Employee("Jane", "Smith","jane.smith@gmail.com", "Manager", "Lead Engineer", 10);
         assertNotEquals(employee.hashCode(), employee2.hashCode());
     }
 }

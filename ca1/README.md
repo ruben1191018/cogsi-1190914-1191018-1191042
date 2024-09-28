@@ -101,3 +101,7 @@ After that we reverted to that commit with the following command
 
     git tag ca1-part1
     git push origin ca1-part1
+
+## Part 2- Branches
+
+### Step1: Create branch named email-field

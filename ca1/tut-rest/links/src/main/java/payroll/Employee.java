@@ -14,14 +14,18 @@ class Employee {
 	private Integer jobYears;
 	private String firstName;
 	private String lastName;
+	private String email;
+
+
 	private String role;
 
 	Employee() {}
 
-	Employee(String firstName, String lastName, String role, String jobTitle, Integer jobYears) {
+	Employee(String firstName, String lastName,String email, String role, String jobTitle, Integer jobYears) {
 
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.email= email;
 		this.role = role;
 		this.jobTitle = jobTitle;
 		this.jobYears = jobYears;
@@ -66,6 +70,18 @@ class Employee {
 		return this.lastName;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		if(!email.isEmpty()){
+			this.email = email;
+		}else{
+			throw new IllegalArgumentException("Email cannot be empty");
+		}
+	}
+
 	public String getRole() {
 		return this.role;
 	}
@@ -98,6 +114,7 @@ class Employee {
 				&& Objects.equals(this.jobYears, employee.jobYears)
 				&& Objects.equals(this.firstName, employee.firstName)
 				&& Objects.equals(this.lastName, employee.lastName)
+				&& Objects.equals(this.email, employee.email)
 				&& Objects.equals(this.role, employee.role);
 	}
 
@@ -110,6 +127,6 @@ class Employee {
 	public String toString() {
 		return "Employee{" + "id=" + this.id
 				+ '\'' + "jobTitle=" + this.jobTitle + '\'' + "jobYears=" + this.jobYears +", firstName='" + this.firstName + '\'' + ", lastName='" + this.lastName
-				+ '\'' + ", role='" + this.role + '\'' + '}';
+				+ '\'' +", email='" + this.email + ", role='" + this.role + '\'' + '}';
 	}
 }
