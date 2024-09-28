@@ -111,6 +111,5 @@ class Employee {
 		return "Employee{" + "id=" + this.id
 				+ '\'' + "jobTitle=" + this.jobTitle + '\'' + "jobYears=" + this.jobYears +", firstName='" + this.firstName + '\'' + ", lastName='" + this.lastName
 				+ '\'' + ", role='" + this.role + '\'' + '}';
-
 	}
 }
