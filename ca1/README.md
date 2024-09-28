@@ -58,8 +58,8 @@ After the code was implemented we added the tests
 
 And we created and pushed the new tag with the new minor version
 
-    git tag v1.2.0
-    git push origin v1.2.0
+    git tag 1.2.0
+    git push origin 1.2.0
 
 ### Step 6: Git Log
 
@@ -96,3 +96,8 @@ After that we reverted to that commit with the following command
     git revert 5f3040778133cc7ca2e7e715bb30e8c6aeafda73
 
 ![img_1.png](imgs/git_revert.png)
+
+### Step 8: Add final git tag for part 1
+
+    git tag ca1-part1
+    git push origin ca1-part1
