@@ -149,13 +149,13 @@ Push the changes to the remote repository
     git push 1.3.0
 
 
-### Step 1: Create branch named fixing-invalid-email
+### Step 6: Create branch named fixing-invalid-email
 
 To create the branch we used the following command:
 
     git checkout -b fixing-invalid-email
 
-### Step 2: Add email validation for At Sign (@)
+### Step 7: Add email validation for At Sign (@)
 
 After that we implemented the email validation in the class employee
 
@@ -163,4 +163,33 @@ Commit- https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/865
 
 ![img_1.png](imgs/email_@_validation.png)
 
-    git commit -m "#6 Add new email field"
+    git commit -m "#8 Add email validation Update Employee.java"
+
+### Step 8: Add unit tests
+Commit - https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/27ec0f38827f8763fb66b3d50f54c493ab7be605
+
+![img_1.png](imgs/email_@_test.png)
+
+    git commit -m "#9 Add tests for email sign validation"
+
+### Step 9: Merge branch into main
+
+After the changes and tests were implemented we merged the branch in main with the following commands:
+
+Checkout to main:
+
+    git checkout main
+
+Merge the fixing-invalid-email branch
+
+    git merge fixing-invalid-email
+
+Push the changes to the remote repository
+
+    git push
+
+### Step 10: Add new tag 1.3.1
+
+    git tag 1.3.1
+    git push 1.3.1
+

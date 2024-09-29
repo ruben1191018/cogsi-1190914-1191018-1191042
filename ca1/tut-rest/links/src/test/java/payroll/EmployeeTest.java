@@ -107,7 +107,7 @@ class EmployeeTest {
     }
 
     @Test
-    void testShouldThrowExceptionWhenEmailIsDoesntHaveAtSign() {
+    void testShouldThrowExceptionWhenEmailDoesntHaveAtSign() {
         assertThrows(IllegalArgumentException.class, () ->new Employee("Jane", "Smith","janesmithgmail.com", "Manager", "Lead Engineer", 10));
     }
 
