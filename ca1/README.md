@@ -492,3 +492,42 @@ Push the changes to the remote repository
 
     hg tag 1.3.1
     hg push
+
+
+### Step 11: Resolve conflicts
+
+When we do:
+
+    hg merge fixing-invalid-email
+
+The hg detects conflicting changes.
+
+If there are conflicting changes in files, Mercurial will display a message like:
+
+    merging <filename> failed!
+
+Identify the conflicting files:
+
+    hg resolve --list
+
+Files that are marked with U (unresolved) will need manual resolution.
+
+To resolve the conflicts, we need to edit the files where conflicts occurred. Open the file(s) marked as unresolved in the text editor. Conflicting sections are marked with conflict markers like this:
+
+
+    >>>>>>> other version (their changes)
+    <<<<<<< local version: This is your version of the code.
+    =======: Separator between the conflicting versions.
+    >>>>>>> other version: This is the code from the changeset you're merging in.
+
+We need to manually edit these sections to choose which version of the code to keep, or combine them if necessary.
+
+After resolving the conflicts:
+
+    hg resolve --mark <filename> or hg resolve --mark --all
+
+    hg commit -m "Merge resolved"
+
+And in the end:
+
+    hg push 
