@@ -193,3 +193,22 @@ Push the changes to the remote repository
     git tag 1.3.1
     git push 1.3.1
 
+### Step 11: Resolve conflicts 
+
+When we do:
+    git merge fixing-invalid-email
+
+The git detects conflicting changes.
+
+Identify the conflicting files:
+    git status
+
+Edit the conflicting files where the markers (<<<<<<, ======, >>>>>>) are and remove them.
+After resolving the conflicts:
+    git add . 
+    git commit
+
+And in the end:
+    git push origin main
+
+
