@@ -148,3 +148,19 @@ Push the changes to the remote repository
     git tag 1.3.0
     git push 1.3.0
 
+
+### Step 1: Create branch named fixing-invalid-email
+
+To create the branch we used the following command:
+
+    git checkout -b fixing-invalid-email
+
+### Step 2: Add email validation for At Sign (@)
+
+After that we implemented the email validation in the class employee
+
+Commit- https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/865be3c3f10ab72439a6643dc12d8a94ff77d07c
+
+![img_1.png](imgs/email_@_validation.png)
+
+    git commit -m "#6 Add new email field"
