@@ -87,7 +87,7 @@ To show the commit in a formatter way with the id of the commit, name of who com
 
 To test the revert command we created a commit (only adding on new line in a file) so we could revert to it
 
-![img.png](img.png)
+![img.png](imgs/imgLogs.png)
 
 After that we reverted to that commit with the following command
 
@@ -415,3 +415,33 @@ Commit- https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/ea9
 
     hg commit -m "#6 Add new email field"
     hg push --new-branch
+
+### Step 3: Add unit tests
+Commit - https://helixteamhub.cloud/isep130074/projects/cogsi-project/repositories/cogsi-1190914-1191018-1191042/changesets/2e880672047dfab6caf3bde7167ae3d301e289da
+
+![img_1.png](imgs/img_1.png)
+
+![img_2.png](imgs/img_2.png)
+
+    hg commit -m "#7 Add test for null and empty email"
+
+### Step 4: Merge branch into main
+
+After the changes and tests were implemented we merged the branch in main with the following commands:
+
+Checkout to main:
+
+    hg update default
+
+Merge the email-field branch
+
+    hg merge email-field
+
+Push the changes to the remote repository
+
+    hg push
+
+### Step 5: Add new tag 1.3.0
+
+    hg tag 1.3.0
+    hg push
