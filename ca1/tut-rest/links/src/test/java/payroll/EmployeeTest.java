@@ -107,6 +107,11 @@ class EmployeeTest {
     }
 
     @Test
+    void testShouldThrowExceptionWhenEmailIsDoesntHaveAtSign() {
+        assertThrows(IllegalArgumentException.class, () ->new Employee("Jane", "Smith","janesmithgmail.com", "Manager", "Lead Engineer", 10));
+    }
+
+    @Test
     void testHashCodeDifferentObjectSameValues() {
         Employee employee2 = new Employee("John", "Doe","john.doe@gmail.com", "Developer", "Software Engineer", 5);
         employee2.setId(employee.getId());
