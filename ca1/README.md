@@ -411,7 +411,7 @@ To create the branch we used the following command:
 
 After that we implemented the new email field in the class employee
 
-Commit- https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/ea946816cb221b029499abe1d377e461ccbc801a
+Commit- https://helixteamhub.cloud/isep130074/projects/cogsi-project/repositories/cogsi-1190914-1191018-1191042/changesets/f347afc656244ca776eb3db0f0e97afe75830f9a
 
     hg commit -m "#6 Add new email field"
     hg push --new-branch
