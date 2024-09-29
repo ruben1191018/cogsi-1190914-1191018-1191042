@@ -83,8 +83,6 @@ To show the commit in a formatter way with the id of the commit, name of who com
 
 ![img_2.png](imgs/gitlog3.png)
 
-To test the revert command
-
 ### Step 7: Git Revert
 
 To test the revert command we created a commit (only adding on new line in a file) so we could revert to it
@@ -296,5 +294,84 @@ Conclusion:
 Git offers more flexibility, power, and scalability, making it suitable for large projects and distributed teams that require complex workflows. However, it comes with a steeper learning curve.
 Mercurial is simpler and easier to use, making it ideal for small projects or teams that prefer a more straightforward approach to version control, without needing to manage complex workflows.
 Both tools are efficient and powerful for version control, and the choice between them depends on the specific needs of the project and the familiarity of the team with distributed version control systems.
+
+
+
+## Part 1 ( No branches )
+
+### Step 1: Setting Up the Project
+
+Firstly we created an account and a repository in the Helix Team Hub which is a artifact repository management platform with built-in support for Git, SVN, Mercurial, Maven and more.
+
+Then we cloned the project with the following command:
+
+    hg clone https://helixteamhub.cloud/isep130074/projects/cogsi-project/repositories/mercurial/cogsi-1190914-1191018-1191042
+
+
+### Step 2: Initial Commits
+We started by adding a read.me file with as a start.
+    
+- hg add read.me – to stage the new file
+- hg commit -m "Initial commit"
+- hg push – to push the change.
+
+After that, we copied the "Building REST Services with Spring" application into the called cosgi-mercurial.
+Commit, pushed and tagged the latest commit as the initial version.
+
+- hg add – to stage all new file
+- hg commit -m "#1 Add the tut-rest project"
+- hg push – to push all the changes.
+
+
+### Step 3: Tag Creation
+
+After completing the initial setup and configuration, we created and pushed the tag 1.1.0 for the project with the following commands
+
+    hg tag 1.1.0
+    hg push 
+
+### Step 4: Project Enhancements
+Subsequently, a change was made to the project links by adding two new fields to the Employee model.
+The necessary support for these new fields was also implemented.
+
+Commit - https://helixteamhub.cloud/isep130074/projects/cogsi-project/repositories/cogsi-1190914-1191018-1191042/changesets/eba74e2e15d0e2f2e43b7b01d39827ff5857884f
+
+- hg pull – to fetch the latest changes.
+- hg add – to stage all the changes
+- hg commit -m "#3 Add new fields to the code"
+- hg push – to push the changes.
+
+
+After the code was implemented we added the tests
+- hg add . – to stage all the changes
+- hg commit -m "#5 Add Employee tests"
+- hg push – to push the changes.
+
+And we created and pushed the new tag with the new minor version
+
+    hg tag 1.2.0
+    hg push
+
+### Step 6: Hg Log
+
+After all the changes we used different hg log commands to view the commit history:
+
+To show the information in a compact way
+
+- hg log --template "{rev}: {desc|firstline}\n"
+
+![img_1.png](imgs/img_log_compact.png)
+
+To show the commits in graph form
+
+     hg log --graph 
+
+![img_1.png](imgs/img_log_graph.png)
+
+To show the commit in a formatter way with the id of the commit, name of who commited, time it was done and the name of the commit
+
+    hg log --template "{rev}: {desc|firstline} by {author|person} on {date|shortdate}\n"
+
+![img_1.png](imgs/img_log.png)
 
 
