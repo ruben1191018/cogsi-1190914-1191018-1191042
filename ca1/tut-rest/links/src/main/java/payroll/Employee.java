@@ -25,7 +25,7 @@ class Employee {
 
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.email= email;
+		setEmail(email);
 		this.role = role;
 		this.jobTitle = jobTitle;
 		this.jobYears = jobYears;
@@ -75,7 +75,7 @@ class Employee {
 	}
 
 	public void setEmail(String email) {
-		if(!email.isEmpty()){
+		if(email!= null && !email.isEmpty()){
 			this.email = email;
 		}else{
 			throw new IllegalArgumentException("Email cannot be empty");

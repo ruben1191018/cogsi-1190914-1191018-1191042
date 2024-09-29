@@ -97,6 +97,16 @@ class EmployeeTest {
     }
 
     @Test
+    void testShouldThrowExceptionWhenEmailIsEmpty() {
+        assertThrows(IllegalArgumentException.class, () ->new Employee("Jane", "Smith","", "Manager", "Lead Engineer", 10));
+    }
+
+    @Test
+    void testShouldThrowExceptionWhenEmailIsNull() {
+        assertThrows(IllegalArgumentException.class, () ->new Employee("Jane", "Smith",null, "Manager", "Lead Engineer", 10));
+    }
+
+    @Test
     void testHashCodeDifferentObjectSameValues() {
         Employee employee2 = new Employee("John", "Doe","john.doe@gmail.com", "Developer", "Software Engineer", 5);
         employee2.setId(employee.getId());
