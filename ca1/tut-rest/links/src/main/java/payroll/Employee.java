@@ -75,10 +75,12 @@ class Employee {
 	}
 
 	public void setEmail(String email) {
-		if(email!= null && !email.isEmpty()){
+		if(email == null || email.isEmpty()){
+			throw new IllegalArgumentException("Email cannot be empty.");
+		}else if(!email.contains("@")) {
+			throw new IllegalArgumentException("Email should have '@'.");
+		}else {
 			this.email = email;
-		}else{
-			throw new IllegalArgumentException("Email cannot be empty");
 		}
 	}
 
