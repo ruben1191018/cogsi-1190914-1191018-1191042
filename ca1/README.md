@@ -445,3 +445,50 @@ Push the changes to the remote repository
 
     hg tag 1.3.0
     hg push
+
+### Step 6: Create branch named fixing-invalid-email
+
+To create the branch we used the following command:
+
+    hg branch fixing-invalid-email
+
+### Step 7: Add email validation for At Sign (@)
+
+After that we implemented the email validation in the class employee
+
+Commit- https://helixteamhub.cloud/isep130074/projects/cogsi-project/repositories/cogsi-1190914-1191018-1191042/changesets/2c6d15676eeb60edf33135a2c30e508b6aba32ab
+
+![img_1.png](imgs/img_step_7.png)
+
+    hg commit -m "#8 Add email validation Update Employee.java"
+    hg push --new-branch
+
+### Step 8: Add unit tests
+Commit - https://helixteamhub.cloud/isep130074/projects/cogsi-project/repositories/cogsi-1190914-1191018-1191042/changesets/bf365ad027ddfc38390548a4b1948667e8cee61d 
+
+![img.png](imgs/img_step_8.png)
+
+    hg commit -m "#9 Add tests for email sign validation"
+    hg push
+
+### Step 9: Merge branch into main
+
+
+After the changes and tests were implemented we merged the branch in main with the following commands:
+
+Checkout to main:
+
+    hg update default
+
+Merge the email-field branch
+
+    hg merge fixing-invalid-email
+
+Push the changes to the remote repository
+
+    hg push 
+
+### Step 10: Add new tag 1.3.1
+
+    hg tag 1.3.1
+    hg push
