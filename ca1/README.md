@@ -392,3 +392,26 @@ After that we reverted to that commit with the following command
     hg backout 9e11d8d43439
 
 ![img_2.png](imgs/hg_backout.png)
+
+
+### Step 7: Add final hg tag for part 1
+
+    hg tag ca1-part1
+    hg push 
+
+## Part 2- Branches
+
+### Step 1: Create branch named email-field
+
+To create the branch we used the following command:
+
+    hg branch "email-field"
+
+### Step 2: Add support for an email field for and employee
+
+After that we implemented the new email field in the class employee
+
+Commit- https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/ea946816cb221b029499abe1d377e461ccbc801a
+
+    hg commit -m "#6 Add new email field"
+    hg push --new-branch
