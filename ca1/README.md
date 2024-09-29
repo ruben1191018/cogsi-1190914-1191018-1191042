@@ -352,7 +352,7 @@ And we created and pushed the new tag with the new minor version
     hg tag 1.2.0
     hg push
 
-### Step 6: Hg Log
+### Step 5: Hg Log
 
 After all the changes we used different hg log commands to view the commit history:
 
@@ -375,3 +375,12 @@ To show the commit in a formatter way with the id of the commit, name of who com
 ![img_1.png](imgs/img_log.png)
 
 
+### Step 6: Hg Backout
+
+To test the backout command we created a commit (only adding on a teste.txt) so we could revert to it
+
+After that we reverted to that commit with the following command
+
+    hg backout 9e11d8d43439
+
+![img_2.png](imgs/hg_backout.png)
