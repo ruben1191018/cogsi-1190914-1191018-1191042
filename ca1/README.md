@@ -129,6 +129,10 @@ Commit - https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/a4
 
 After the changes and tests were implemented we merged the branch in main with the following commands:
 
+Publish the branch: 
+
+    git push --set-upstream origin email-field
+
 Checkout to main:
  
     git checkout main
@@ -173,6 +177,10 @@ Commit - https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/27
 ### Step 9: Merge branch into main
 
 After the changes and tests were implemented we merged the branch in main with the following commands:
+
+Publish the branch:
+
+    git push --set-upstream fixing-invalid-email
 
 Checkout to main:
 
