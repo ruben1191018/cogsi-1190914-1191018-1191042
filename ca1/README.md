@@ -104,4 +104,47 @@ After that we reverted to that commit with the following command
 
 ## Part 2- Branches
 
-### Step1: Create branch named email-field
+### Step 1: Create branch named email-field
+
+To create the branch we used the following command:
+
+    git checkout -b email-field
+
+### Step 2: Add support for an email field for and employee 
+
+After that we implemented the new email field in the class employee
+
+Commit- https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/ea946816cb221b029499abe1d377e461ccbc801a
+
+![img_1.png](imgs/new_email_field.png)
+
+    git commit -m "#6 Add new email field"
+
+### Step 3: Add unit tests
+Commit - https://github.com/ruben1191018/cogsi-1190914-1191018-1191042/commit/a43664bce078cfd8269578ff24f8dbc53c4c41f1
+
+![img_1.png](imgs/unit_tests_email.png)
+
+    git commit -m "#7 Add test for null and empty email"
+
+### Step 4: Merge branch into main
+
+After the changes and tests were implemented we merged the branch in main with the following commands:
+
+Checkout to main:
+ 
+    git checkout main
+
+Merge the email-field branch
+    
+    git merge email-field
+
+Push the changes to the remote repository 
+
+    git push
+
+### Step 5: Add new tag 1.3.0
+
+    git tag 1.3.0
+    git push 1.3.0
+
