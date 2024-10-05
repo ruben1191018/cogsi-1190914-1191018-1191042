@@ -1,3 +1,4 @@
+package payroll;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,10 +9,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import payroll.Order;
-import payroll.OrderModelAssembler;
-import payroll.OrderRepository;
-import payroll.Status;
 
 import java.util.Arrays;
 
