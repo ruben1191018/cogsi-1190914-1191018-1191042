@@ -54,3 +54,39 @@ And the zip file is saved in a directory called backups
 Before zipping, the doFirst block cleans up the old backups and recreates a new directory
 
 After the task finishes, the doLast block prints a message indicating the source code has been backed up along with the location of the zip file
+
+### Step 3 - Create a custom task that depends on the installDist task and runs the application using the generated distribution scripts
+
+To do this we added the new following task called runDistApp:
+    
+    task runDistApp(type: Exec){
+        group = "Application"
+        description = "Runs the application using the generated distribution scripts."
+    
+        dependsOn installDist
+    
+        def os = org.gradle.internal.os.OperatingSystem.current()
+    
+        def appDir = "$buildDir/install/${project.name}/bin"
+        def execScript
+    
+        if (os.isWindows()) {
+            execScript = "${appDir}/${project.name}.bat"
+        } else {
+            execScript = "${appDir}/${project.name}"
+        }
+    
+        println "Running the application using: $execScript"
+    
+        executable = execScript
+    }
+
+- dependsOn installDist: This ensures that the installDist task is executed before the custom task (runDistApp). The installDist task generates the necessary distribution files and scripts under the build/install directory.
+
+- org.gradle.internal.os.OperatingSystem.current(): This Gradle API helps in detecting the current operating system, which is used to choose the correct executable script (either .bat for Windows or .sh for Unix-based systems).
+
+- appDir: This variable contains the path to the generated distribution scripts
+
+- Determine Script Path: Based on the operating system, the script to run is selected. For Windows, it's a .bat file, and for other OSes, it's a .sh file.
+
+executable: Since this is a Exec Type, we define the correct script file as the executable.

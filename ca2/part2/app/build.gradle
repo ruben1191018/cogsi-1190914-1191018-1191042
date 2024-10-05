@@ -82,29 +82,26 @@ task backupSource(type: Zip) {
     }
 }
 
-task runDistApp {
+task runDistApp(type: Exec){
     group = "Application"
     description = "Runs the application using the generated distribution scripts."
 
     dependsOn installDist
 
-    doLast {
-        def os = org.gradle.internal.os.OperatingSystem.current()
+    def os = org.gradle.internal.os.OperatingSystem.current()
 
-        def appDir = "$buildDir/install/${project.name}/bin"
-        def execScript
+    def appDir = "$buildDir/install/${project.name}/bin"
+    def execScript
 
-        if (os.isWindows()) {
-            execScript = "${appDir}/${project.name}.bat"
-        } else {
-            execScript = "${appDir}/${project.name}"
-        }
-
-        println "Running the application using: $execScript"
-        exec {
-            executable = execScript
-        }
+    if (os.isWindows()) {
+        execScript = "${appDir}/${project.name}.bat"
+    } else {
+        execScript = "${appDir}/${project.name}"
     }
+
+    println "Running the application using: $execScript"
+
+    executable = execScript
 }
 
 task packageJavadoc(type: Zip) {
