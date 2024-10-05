@@ -86,3 +86,23 @@ To execute the tests, the following Gradle command can be used:
     ./gradlew test
 
 This command runs all unit tests in the project and outputs the results, showing which tests passed, were skipped, or failed, in accordance with the logging settings defined in the test task.
+
+### Step 3 - Create a new task of type Copy
+
+To create the new task to execute the server we edited the build.gradle file
+and added the following task named backup
+
+    task backup(type: Copy) {
+        from 'src'
+        
+        into "backup"
+    }
+
+This a task of type Copy wich allows Gradle to copy a folder.
+
+- from: This defines the source directory that the task will copy from. In this case, it's the src folder, which contains the source code of the project.
+- into: This sets the destination directory where the contents of the src folder will be copied. In this case, it will copy everything into a folder named backup in the project’s root directory.
+
+For the backup to be executed, using the gradle task, we can use the following gradle command:
+
+    ./gradlew backup
