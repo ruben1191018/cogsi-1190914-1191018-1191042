@@ -1,9 +1,11 @@
 <project name="Basic Demo" default="jar" basedir=".">
     <!-- Set global properties for this build -->
     <property name="src.dir" value="src/main/java"/>
+    <property name="test.src.dir" value="src/test/basic_demo"/> <!-- Test source directory -->
     <property name="build.dir" value="build"/>
     <property name="lib.dir" value="lib"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="test.classes.dir" value="${build.dir}/test-classes"/> <!-- Test classes directory -->
     <property name="jar.dir" value="${build.dir}/libs"/>
     <property name="main-class" value="basic_demo.App"/>
     <property name="client-main-class" value="basic_demo.ChatClientApp"/>
@@ -11,6 +13,7 @@
     <!-- Initialize build directories -->
     <target name="init">
         <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${test.classes.dir}"/> <!-- Test classes directory -->
         <mkdir dir="${jar.dir}"/>
     </target>
 
@@ -20,6 +23,20 @@
             <compilerarg value="--release"/>
             <compilerarg value="17"/> <!-- Java 17 -->
             <classpath>
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- Compile the test classes -->
+    <target name="compileTests" depends="init">
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" includeantruntime="false">
+            <compilerarg value="--release"/>
+            <compilerarg value="17"/> <!-- Java 17 -->
+            <classpath>
+                <pathelement path="${classes.dir}"/>
                 <fileset dir="${lib.dir}">
                     <include name="**/*.jar"/>
                 </fileset>
@@ -65,5 +82,26 @@
             <arg value="localhost"/>
             <arg value="59001"/> <!-- Default port -->
         </java>
+    </target>
+
+    <!-- Run JUnit tests -->
+    <target name="test" depends="compileTests">
+        <mkdir dir="${build.dir}/test-reports"/>
+        <junit printsummary="on" haltonfailure="yes" haltonerror="yes" fork="true" showoutput="true">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <pathelement path="${test.classes.dir}"/>
+                <fileset dir="${lib.dir}">
+                    <!-- Add JUnit and its dependencies to the classpath -->
+                    <include name="junit-platform-console-standalone-1.9.2.jar"/>
+                </fileset>
+            </classpath>
+            <formatter type="plain"/>
+            <batchtest todir="${build.dir}/test-reports">
+                <fileset dir="${test.classes.dir}">
+                    <include name="**/*Test.class"/> <!-- Include test classes -->
+                </fileset>
+            </batchtest>
+        </junit>
     </target>
 </project>
