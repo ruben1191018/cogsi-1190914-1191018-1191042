@@ -83,10 +83,48 @@ To do this we added the new following task called runDistApp:
 
 - dependsOn installDist: This ensures that the installDist task is executed before the custom task (runDistApp). The installDist task generates the necessary distribution files and scripts under the build/install directory.
 
+![img.png](img.png)
+
 - org.gradle.internal.os.OperatingSystem.current(): This Gradle API helps in detecting the current operating system, which is used to choose the correct executable script (either .bat for Windows or .sh for Unix-based systems).
 
 - appDir: This variable contains the path to the generated distribution scripts
 
 - Determine Script Path: Based on the operating system, the script to run is selected. For Windows, it's a .bat file, and for other OSes, it's a .sh file.
 
-executable: Since this is a Exec Type, we define the correct script file as the executable.
+- executable: Since this is a Exec Type, we define the correct script file as the executable.
+
+To run this:
+
+./gradlew runDistApp
+
+### Step 4 - Create a custom task that depends on the javadoc task, which generates the Javadoc for your project, and then packages the generated documentation into a zip file
+
+To do this we added the new following task called packageJavadoc:
+    
+    task packageJavadoc(type: Zip) {
+        group = "Documentation"
+        description = "Generates Javadoc and packages it into a ZIP file."
+    
+        dependsOn javadoc
+    
+        from javadoc.destinationDir
+    
+        destinationDirectory = file("$rootDir/app")
+    
+        archiveFileName = "javadoc.zip"
+    
+        doLast {
+            println "Javadoc has been generated and packaged into $destinationDirectory/javadoc.zip"
+        }
+    }
+
+
+- dependsOn javadoc: This makes the packageJavadoc task depend on the javadoc task. Gradle will run the javadoc task first to generate the documentation before executing this task.
+
+- from javadoc.destinationDir: This defines the source directory for the ZIP file as the output of the javadoc task. The javadoc.destinationDir holds the path where the generated Javadoc is stored.
+
+- destinationDirectory = file("$$rootDir/docs"): This specifies where the ZIP file will be stored. In this case, it will be placed in the app folder.
+
+- archiveFileName = "javadoc.zip": This sets the name of the ZIP file that will be created.
+
+![img_1.png](img_1.png)
