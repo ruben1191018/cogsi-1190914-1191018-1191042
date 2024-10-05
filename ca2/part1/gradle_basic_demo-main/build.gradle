@@ -75,3 +75,14 @@ test {
         events "passed", "skipped", "failed"
     }
 }
+
+
+task backup(type: Copy) {
+    from 'src'
+
+    into "backup"
+
+    doLast {
+        println "Backup completed! Sources copied to backup folder."
+    }
+}
