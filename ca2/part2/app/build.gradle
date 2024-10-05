@@ -106,3 +106,20 @@ task runDistApp {
         }
     }
 }
+
+task packageJavadoc(type: Zip) {
+    group = "Documentation"
+    description = "Generates Javadoc and packages it into a ZIP file."
+
+    dependsOn javadoc
+
+    from javadoc.destinationDir
+
+    destinationDirectory = file("$rootDir/app")
+
+    archiveFileName = "javadoc.zip"
+
+    doLast {
+        println "Javadoc has been generated and packaged into $destinationDirectory/javadoc.zip"
+    }
+}
