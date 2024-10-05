@@ -81,3 +81,28 @@ task backupSource(type: Zip) {
         println "Source code successfully backed up and stored in ${destinationDirectory.get().asFile.absolutePath}"
     }
 }
+
+task runDistApp {
+    group = "Application"
+    description = "Runs the application using the generated distribution scripts."
+
+    dependsOn installDist
+
+    doLast {
+        def os = org.gradle.internal.os.OperatingSystem.current()
+
+        def appDir = "$buildDir/install/${project.name}/bin"
+        def execScript
+
+        if (os.isWindows()) {
+            execScript = "${appDir}/${project.name}.bat"
+        } else {
+            execScript = "${appDir}/${project.name}"
+        }
+
+        println "Running the application using: $execScript"
+        exec {
+            executable = execScript
+        }
+    }
+}
