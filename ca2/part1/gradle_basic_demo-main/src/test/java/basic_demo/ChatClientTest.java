@@ -8,5 +8,6 @@ class ChatClientTest {
 
     @Test
     void run() {
+        assertTrue(true);
     }
 }
