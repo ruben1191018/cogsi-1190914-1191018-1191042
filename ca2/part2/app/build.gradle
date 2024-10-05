@@ -58,3 +58,26 @@ application {
     // Define the main class for the application.
     mainClass = 'payroll.PayrollApplication'
 }
+
+
+task backupSource(type: Zip) {
+    group = "Backup"
+    description = "Zips the entire source code and stores it in a backup directory."
+
+    from 'src'
+    include '**/*'
+
+    destinationDirectory = file("backups")
+
+    archiveFileName = "source-backup-${new Date().format('yyyy-MM-dd_HH-mm-ss')}.zip"
+
+    doFirst {
+        println "Cleaning backup directory and preparing for zipping the source code..."
+        delete file("backups")
+        mkdir file("backups")
+    }
+
+    doLast {
+        println "Source code successfully backed up and stored in ${destinationDirectory.get().asFile.absolutePath}"
+    }
+}
