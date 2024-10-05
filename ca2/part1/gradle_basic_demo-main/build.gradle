@@ -80,10 +80,6 @@ task backup(type: Copy) {
     from 'src'
 
     into "backup"
-
-    doLast {
-        println "Backup completed! Sources copied to backup folder."
-    }
 }
 
 task zipBackup(type: Zip) {
@@ -94,8 +90,4 @@ task zipBackup(type: Zip) {
     destinationDirectory = file("archives")
 
     archiveFileName = "backup.zip"
-
-    doLast {
-        println "Zip archive created at archives/backup.zip"
-    }
 }
