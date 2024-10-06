@@ -113,4 +113,38 @@
         <echo message="Backup complete! Zip file is located at ${backup.zip}"/>
     </target>
 
+    <path id="project.classpath">
+        <pathelement path="${build.dir}/classes"/>
+
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+    <property name="javadoc.dir" value="${build.dir}/javadoc"/>
+    <!-- Task to generate Javadoc -->
+    <target name="generateJavadoc">
+        <!-- Create the directory for the generated Javadoc -->
+        <mkdir dir="${javadoc.dir}"/>
+
+        <!-- Generate the Javadoc -->
+        <javadoc destdir="${javadoc.dir}" sourcepath="${src.dir}" classpathref="project.classpath">
+            <!-- Optional: set the package names to include -->
+            <packageset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </packageset>
+        </javadoc>
+
+        <echo message="Javadoc generated in ${javadoc.dir}"/>
+    </target>
+
+    <property name="zip.name" value="javadoc.zip"/>
+    <target name="packageJavadoc" depends="generateJavadoc">
+        <mkdir dir=""/>
+
+        <zip destfile="${zip.name}">
+            <fileset dir="${javadoc.dir}"/>
+        </zip>
+
+        <echo message="Javadoc packaged into /${zip.name}"/>
+    </target>
+
 </project>
