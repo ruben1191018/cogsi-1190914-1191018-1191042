@@ -104,4 +104,19 @@
             </batchtest>
         </junit>
     </target>
+    <!-- Backup the sources -->
+    <target name="backup" description="Backup the source files">
+        <mkdir dir="backups"/> <!-- Ensure backup directory exists -->
+        <copy todir="backups">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/> <!-- Include all Java source files -->
+            </fileset>
+        </copy>
+        <echo message="Backup completed! Sources are copied to the backup directory."/>
+    </target>
+
+    <target name="zipBackup" depends="backup" description="Create a zip archive of the backup">
+        <zip destfile="backup.zip" basedir="b"/>
+        <echo message="Backup archive created at ${backup.zip}."/>
+    </target>
 </project>
