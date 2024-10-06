@@ -128,3 +128,29 @@ To do this we added the new following task called packageJavadoc:
 - archiveFileName = "javadoc.zip": This sets the name of the ZIP file that will be created.
 
 ![img_1.png](img_1.png)
+
+### Step 5 - Create a new source set for integration tests
+
+To start working on the integration tests we had to make sure we had the correct the dependencies:
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+This dependency is a starter for testing Spring Boot applications with libraries including JUnit Jupiter, Hamcrest and Mockito
+
+We also added the following configuration to use JUnit Platform as the test engine.
+
+    test {
+        useJUnitPlatform()
+    }
+
+We developed an integration test for the Get All Orders endpoint. To prepare for each test, we introduced a setUp method annotated with @BeforeEach,
+which ensures a clean test environment. 
+This method clears all existing records from the database
+, then creates and saves two new orders with distinct statuses and descriptions.
+By resetting the database and populating it with fresh data, we ensure consistent test
+results.
+
+![img_3.png](img_3.png)
+
+After that we created a method to perform the Get All Orders and validate that the response was Ok 200.
+![img_2.png](img_2.png)
