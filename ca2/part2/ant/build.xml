@@ -147,4 +147,23 @@
         <echo message="Javadoc packaged into /${zip.name}"/>
     </target>
 
+    <property name="test.src.dir" value="src/test/java/payroll"/> <!-- Test source directory -->
+    <property name="test.classes.dir" value="${build.dir}/test-classes"/> <!-- Test classes directory -->
+    <!-- Run JUnit tests -->
+    <target name="test" depends="compileTests">
+        <mkdir dir="${build.dir}/test-reports"/>
+        <junit printsummary="on" haltonfailure="yes" haltonerror="yes" fork="true" showoutput="true">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <pathelement path="${test.classes.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <formatter type="plain"/>
+            <batchtest todir="${build.dir}/test-reports">
+                <fileset dir="${test.classes.dir}">
+                    <include name="**/*Test.class"/> <!-- Include test classes -->
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
 </project>
