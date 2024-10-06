@@ -145,3 +145,122 @@ When we run the command gradle -q javaToolchain, Gradle outputs details about th
 
 
 ![img.png](gradletoolchain.png)
+
+## Part 1 - Alternative(Ant)
+
+### Step 1- Create Ant task to execute server
+
+To execute the chat server in Ant, we created a custom target in the build.xml file named 
+runServer. This target is responsible for compiling the project, packaging it into a JAR 
+file, and then running the chat server. Here's the breakdown of how the task was implemented:
+
+    <target name="runServer" depends="jar">
+        <java classname="basic_demo.ChatServerApp" fork="true" failonerror="true">
+            <classpath>
+                <pathelement path="${jar.dir}/basic_demo.jar"/>
+                <fileset dir="${lib.dir}">
+                    <include name="log4j-api-2.24.1.jar"/>
+                    <include name="log4j-core-2.24.1.jar"/>
+                </fileset>
+            </classpath>
+            <arg value="59001"/> <!-- Server Port -->
+        </java>
+    </target>
+
+- depends="jar": This ensures that the server will only run after the project has been compiled and the JAR file is created.
+- classname="basic_demo.ChatServerApp": This specifies the fully qualified name of the class containing the main() method that launches the server.
+- fork="true": Ensures that the Java process is launched in a separate process, allowing for better process control.
+- Classpath: The necessary libraries, including Log4J, are added to the classpath to ensure the server runs without issues. This is similar to how Gradle’s sourceSets.main.runtimeClasspath is set up.
+- arg value="59001": This argument specifies the port number the server will use.
+
+To run the server, you just need to use the following command:
+
+    ant runServer
+
+### Step 2- Adding Unit Tests and Configuring Ant for JUnit
+
+Next, we set up unit testing using JUnit in Ant. For this, I created a target named test 
+which compiles the test classes and runs them using the junit task:
+
+
+    <target name="test" depends="compileTests">
+        <mkdir dir="${build.dir}/test-reports"/>
+        <junit printsummary="on" haltonfailure="yes" haltonerror="yes" fork="true" showoutput="true">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <pathelement path="${test.classes.dir}"/>
+                <fileset dir="${lib.dir}">
+                    <include name="junit-platform-console-standalone-1.9.2.jar"/>
+                </fileset>
+            </classpath>
+            <formatter type="plain"/>
+            <batchtest todir="${build.dir}/test-reports">
+                <fileset dir="${test.classes.dir}">
+                    <include name="**/*Test.class"/> <!-- Include all test classes -->
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+- JUnit Platform: The standalone JUnit platform is added to the classpath to execute the tests, which is similar to how JUnit is configured in Gradle using the useJUnitPlatform() function.
+- Test Logging: The test results are printed, and the task halts on failure or error, providing a quick summary, just like in Gradle with testLogging.
+- Batch Test: It scans the compiled test classes (*Test.class) and runs all of them.
+
+To run the unit tests, we used:
+
+    ant test
+
+### Step 3: Creating a Backup Task
+
+To ensure that the project’s source code is properly backed up, we created a task named 
+backup. This task copies the source files into a separate backup directory. The configuration 
+is as follows:
+
+    <target name="backup" description="Backup the source files">
+        <mkdir dir="backups"/> <!-- Ensure backup directory exists -->
+        <copy todir="backups">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/> <!-- Include all Java source files -->
+            </fileset>
+        </copy>
+        <echo message="Backup completed! Sources are copied to the backup directory."/>
+    </target>
+
+- mkdir: Creates the backups directory if it doesn't exist already.
+- copy: Copies all the .java files from the source directory (src/main/java) into the newly created backups directory.
+- echo: Prints a confirmation message once the backup process is completed.
+
+We ran this task with:
+
+    ant backup
+
+### Step 4: Creating a Zip Archive of the Backup
+
+To compress the backup into a ZIP file, we added a task named zipBackup. 
+This task zips the backups directory into an archive file, ensuring that the backup can 
+be stored more efficiently:
+
+    <target name="zipBackup" depends="backup" description="Create a zip archive of the backup">
+        <zip destfile="backup.zip" basedir="backups"/>
+        <echo message="Backup archive created at ${backup.zip}."/>
+    </target>
+
+- depends="backup": The zipBackup task depends on the backup task, ensuring that the backup is created before it's zipped.
+- zip: Compresses the backups directory into a ZIP file called backup.zip.
+- echo: Outputs a message confirming that the archive was successfully created.
+
+To create the ZIP archive, we ran:
+
+    ant zipBackup
+
+### Java Toolchains and JDK Compatibility
+
+Unlike Gradle's automatic handling of Java toolchains, in Ant we manually specified the 
+Java version to ensure compatibility across environments. The following lines in the javac 
+task ensure that Java 17 is used for compiling both the source code and the tests:
+
+    <compilerarg value="--release"/>
+    <compilerarg value="17"/>
+
+This guarantees that the project is compiled using Java 17, similar to the way Gradle’s Java 
+toolchains handle the JDK version management automatically.
