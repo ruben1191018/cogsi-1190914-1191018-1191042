@@ -134,3 +134,14 @@ This a task of type Zip which allows Gradle zip a directory.
 For the zip to be executed, using the gradle task, we can use the following gradle command:
 
     ./gradlew zipBackup
+
+It wasn't necessary to manually download and install specific versions of Gradle and the JDK for this application because the project uses Gradle's Wrapper and Java toolchains.
+
+Gradle Wrapper: This feature allows the project to include a specific version of Gradle in the project itself. When we run ./gradlew (the Gradle wrapper script), it automatically downloads the correct version of Gradle for the project if it's not already available on the machine. This ensures the build always uses the same Gradle version, avoiding compatibility issues.
+
+Java Toolchains: Java toolchains in Gradle make it possible to define the Java version required to compile, test, and run the project, even if the correct JDK is not installed locally. Gradle will automatically download and use the appropriate version of the JDK if it’s not available.
+
+When we run the command gradle -q javaToolchain, Gradle outputs details about the Java toolchain being used. This includes the version of the JDK used by Gradle, confirming that you don’t need to manually manage the JDK for this project.
+
+
+![img.png](gradletoolchain.png)
