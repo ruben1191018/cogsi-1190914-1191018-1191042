@@ -1,0 +1,35 @@
+<ivy-module version="2.0">
+    <info organisation="com.example" module="myproject" revision="1.0"/>
+
+    <dependencies>
+        <!-- Guava library -->
+        <dependency org="com.google.guava" name="guava" rev="31.1-jre">
+            <artifact name="guava" type="jar"/>
+        </dependency>
+
+        <!-- Spring Boot Web Starter -->
+        <dependency org="org.springframework.boot" name="spring-boot-starter-web" rev="3.1.2">
+            <artifact name="spring-boot-starter-web" type="jar"/>
+        </dependency>
+
+        <!-- Spring Boot Data JPA Starter -->
+        <dependency org="org.springframework.boot" name="spring-boot-starter-data-jpa" rev="3.1.2">
+            <artifact name="spring-boot-starter-data-jpa" type="jar"/>
+        </dependency>
+
+        <!-- Spring Boot HATEOAS Starter -->
+        <dependency org="org.springframework.boot" name="spring-boot-starter-hateoas" rev="3.1.2">
+            <artifact name="spring-boot-starter-hateoas" type="jar"/>
+        </dependency>
+
+        <!-- H2 Database (runtime only) -->
+        <dependency org="com.h2database" name="h2" rev="2.2.220">
+            <artifact name="h2" type="jar"/>
+        </dependency>
+
+        <!-- Spring Boot Test Starter -->
+        <dependency org="org.springframework.boot" name="spring-boot-starter-test" rev="3.1.2">
+            <artifact name="spring-boot-starter-test" type="jar"/>
+        </dependency>
+    </dependencies>
+</ivy-module>
