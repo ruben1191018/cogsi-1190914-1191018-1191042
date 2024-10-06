@@ -148,6 +148,130 @@ When we run the command gradle -q javaToolchain, Gradle outputs details about th
 
 ## Part 1 - Alternative(Ant)
 
+### Step 0 - Comparison between Ant and Gradle in Build Automation
+
+#### Build Automation Features
+
+Gradle and Apache Ant are both popular build tools for Java applications, but they offer distinct approaches to automation, flexibility, and extensibility.
+
+1 - Declarative vs. Procedural Approach:
+
+- Gradle: Gradle uses a declarative approach to build automation, which means that the build 
+file (typically written in Groovy or Kotlin) describes what to do. Gradle implicitly handles 
+dependencies between tasks and automatically applies best practices for task execution.
+  - Example: In the Gradle build file, we defined tasks like runServer and runClient, and 
+Gradle automatically handled the task execution order and classpath setup based on project configuration.
+- Ant: Ant, on the other hand, follows a procedural approach, meaning that you explicitly 
+define how each step should be executed. Every action, such as compiling code or creating 
+directories, must be specified explicitly.
+  - Example: In the Ant build file, we had to manually specify the directories for compiled 
+classes, explicitly call javac to compile code, and define classpaths in various targets. 
+Ant also requires manual definition of dependencies between tasks (e.g., the runServer 
+target depends on the jar target).
+
+2 - Extensibility and Plugins:
+
+- Gradle: Gradle offers a wide range of plugins that extend its functionality, making it 
+highly flexible. For example, plugins for Java, Kotlin, Android, and more are easily integrated 
+into a build script with a single line of configuration.
+    - Example: In the provided Gradle build file, the application plugin is used to simplify 
+the task of building and running Java applications, which includes configuring the main class 
+and handling dependencies like Log4J.
+- Ant: Ant does not have a formal plugin system like Gradle. However, you can extend it by 
+writing custom Ant tasks or incorporating external libraries. Writing custom tasks in Ant 
+requires additional boilerplate code.
+    - Example: To implement custom logic in Ant, you would need to write Java classes 
+extending Ant’s Task class, whereas in Gradle, writing new tasks is as simple as adding 
+them to the build script using the task keyword.
+  
+3 - Dependency Management:
+
+- Gradle: Gradle has built-in dependency management, relying on Maven or Ivy repositories. 
+It handles transitive dependencies and ensures that the correct versions of libraries are used.
+  - Example: In the Gradle file, we defined dependencies like Log4J and JUnit directly using
+the implementation and testImplementation configurations, and Gradle fetched them from Maven 
+Central automatically.
+- Ant: Ant lacks built-in dependency management. You need to manually manage dependencies 
+by downloading the libraries and including them in the lib folder or specifying their location.
+  - Example: In the Ant file, we had to manually place JAR files (Log4J and JUnit) in the 
+lib directory and add them to the classpath.
+
+#### Extending with New Functionality
+
+Both tools can be extended with new tasks or features, but the process is more streamlined in Gradle.
+
+- Gradle:
+  - Adding new functionality in Gradle is simple. You can define new tasks using the task 
+keyword, and existing tasks can be modified or extended with task configuration blocks.
+  - Example: We defined new tasks like runServer and runClient directly in the Gradle build file.
+Each task was configured with a description, classpath, and arguments without any need to write 
+additional Java code or create custom task classes.
+  - Gradle’s plugin ecosystem further simplifies adding complex functionality like Docker 
+integration, code quality tools, or continuous integration support.
+- Ant:
+  - Ant allows the creation of new tasks, but it typically requires writing a custom task 
+class in Java and registering it in the build file. This makes extending Ant more complex 
+than Gradle.
+  - Example: In the Ant build file, we had to explicitly define every task using the 
+<target> element and manage dependencies between tasks using depends. To create more advanced 
+tasks, I would need to write custom Java code.
+  - While Ant has some prebuilt tasks and libraries, integrating complex functionality 
+often requires much more manual configuration than in Gradle.
+  
+#### Comparison of Task Definition
+
+- Gradle: Tasks are defined declaratively and can be reused or configured dynamically with 
+minimal code. For example, the runClient and runServer tasks were defined with just a few 
+lines of configuration using the JavaExec task type.
+
+- Ant: Tasks in Ant are defined procedurally using <target> elements. Each task must be 
+manually defined, and the build script tends to grow significantly as more functionality is 
+added. For instance, the runServer task required explicit classpath and argument management.
+
+#### Applying Ant to Solve the Same Goals
+
+If we were to solve the same goals using Ant (as outlined in this assignment), the process 
+would be as follows:
+
+1 - Building the Application:
+
+- We would need to define a compile target that compiles the Java source code, and a jar 
+target to package the compiled classes into a JAR file. This was implemented in the Ant 
+build file with explicit use of <javac> and <jar> tasks.
+
+2 - Running the Server and Client:
+
+- In Ant, the runServer and runClient tasks were defined using the <java> task, with 
+classpaths and arguments manually specified. These tasks launch the respective classes 
+with the correct arguments (e.g., 59001 for the server port).
+
+3 - Unit Testing:
+
+- We used the <junit> task in Ant to run unit tests. The classpath for test execution had 
+to be manually managed, and test reports were generated in a specified directory. This 
+approach is more manual than Gradle’s built-in test task, which uses the JUnit platform 
+out of the box.
+
+4 - Backup and Archiving:
+
+- In Ant, we created a backup target that copies the source code to a backup directory, 
+followed by a zipBackup target that creates a ZIP archive. These tasks were implemented 
+using <copy> and <zip>, which required explicit file handling and directory setup, unlike 
+the simplified Copy and Zip tasks in Gradle.
+
+#### Conclusion of Comparison between Ant and Gradle in Build Automation
+
+Overall, Gradle offers a more modern, declarative, and efficient way to manage build automation 
+compared to Ant. It simplifies dependency management, extends functionality easily via plugins, 
+and offers a clean way to define tasks without needing boilerplate. Ant, while powerful and 
+flexible, requires more manual setup, making it less efficient for large or complex projects 
+where Gradle’s features shine.
+
+While Ant can solve the same goals as Gradle (as demonstrated in this assignment), Gradle is 
+generally more suitable for modern projects, especially with its better support for complex 
+builds, plugins, and automated dependency management.
+
+
 ### Step 1- Create Ant task to execute server
 
 To execute the chat server in Ant, we created a custom target in the build.xml file named 
