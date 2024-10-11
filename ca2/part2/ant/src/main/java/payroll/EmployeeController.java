@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 // tag::constructor[]
 @RestController
-class EmployeeController {
+public class EmployeeController {
 
 	private final EmployeeRepository repository;
 

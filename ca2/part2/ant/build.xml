@@ -26,7 +26,7 @@
     <!-- Resolve dependencies using Ivy -->
     <target name="resolve" depends="init">
         <ivy:resolve file="ivy.xml" />
-        <ivy:retrieve pattern="lib/[artifact]-[revision].[ext]" />
+        <ivy:retrieve pattern="lib/[conf]/[artifact]-[type]-[revision].[ext]" />
     </target>
 
     <!-- Compile the source code -->

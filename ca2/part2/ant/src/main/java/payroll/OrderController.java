@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 // tag::main[]
 @RestController
-class OrderController {
+public class OrderController {
 
 	private final OrderRepository orderRepository;
 	private final OrderModelAssembler assembler;
