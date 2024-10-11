@@ -154,3 +154,57 @@ results.
 
 After that we created a method to perform the Get All Orders and validate that the response was Ok 200.
 ![img_2.png](img_2.png)
+
+
+## Part 2 - Alternative(Ant)
+
+### Step 1- Convert the building rest services to Ant (instead of Maven)
+
+
+For this part we decided to use Ivy in combination with Ant
+Ivy complements Ant by automating dependency management. With Ivy, we can define the project dependencies in a simple ivy.xml file, and it will automatically download and manage the correct versions of libraries from central repositories (like Maven Central).
+
+In a new directory we created the build.xml file and an ivy.xml file.
+
+In the build.xml file we defined the ivy dependency using the following code:
+
+
+![img_4.png](img_4.png)
+
+The Ivy tasks were loaded, the path to where ivy configurations are located and where the ivy.xml file is located was also configured
+
+
+In the ivy.xml file we defined the dependencies we needed
+
+![img_5.png](img_5.png)
+
+
+After that we ran the "ant" command, to install all the dependencies needed
+
+In the same build.xml we added the compile and jar targets, to compile and create the jard for the application
+
+![img_6.png](img_6.png)
+
+![img_7.png](img_7.png)
+
+
+We ran the ant jar, that depends on the compile task, so it runs both targets
+
+To be able to run the application we added the following target, named runApplication
+
+![img_8.png](img_8.png)
+
+To run the application we just need to run the following command 
+
+    ant run application
+
+
+### Step 2 Create a custom task that zips and stores in backup directory
+
+For this step we created 5 tasks that work like steps that depende on each other to clean the backup, create the backup directory, copy the source code to a temporary backup directory and to zip the copied source code
+
+To run this step, we just need to run the zipSourceCode target, that runs all the other ones, that are dependent, with the following command:
+
+    ant zipSourceCode
+
+![img_9.png](img_9.png)
