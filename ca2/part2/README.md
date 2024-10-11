@@ -208,3 +208,49 @@ To run this step, we just need to run the zipSourceCode target, that runs all th
     ant zipSourceCode
 
 ![img_9.png](img_9.png)
+
+
+### Step 3 Generates javadoc and zips it.
+
+    <path id="project.classpath">
+        <pathelement path="${build.dir}/classes"/>
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+We started by difining a named path, which can be referenced by other elements.
+Specifies a set of files, that includes all .jar files found in the library directory and its subdirectories.
+
+
+    <property name="javadoc.dir" value="${build.dir}/javadoc"/>
+
+This line defines a property called javadoc.dir, which indicates the directory where the generated Javadoc documentation will be stored.
+
+
+    <target name="generateJavadoc">
+        <mkdir dir="${javadoc.dir}"/>
+        <javadoc destdir="${javadoc.dir}" sourcepath="${src.dir}" classpathref="project.classpath">
+            <packageset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </packageset>
+        </javadoc>
+        <echo message="Javadoc generated in ${javadoc.dir}"/>
+    </target>
+
+
+This defines a new target called generateJavadoc and creates the directory where the Javadoc documentation will be generated if it does not already exist.
+Then the task javadoc will generate the javadoc documentation using the src directory.
+
+    <property name="zip.name" value="javadoc.zip"/>
+
+This defines a property called zip.name, which stores the name of the ZIP file that will be created to package the Javadoc documentation.
+
+    <target name="packageJavadoc" depends="generateJavadoc">
+        <mkdir dir=""/>
+        <zip destfile="${zip.name}">
+            <fileset dir="${javadoc.dir}"/>
+        </zip>
+        <echo message="Javadoc packaged into /${zip.name}"/>
+    </target>
+
+This defines another target called packageJavadoc, which depends on the generateJavadoc target. 
+It creates a ZIP file with the name defined in the zip.name property, using the file set of the javadoc directory.
