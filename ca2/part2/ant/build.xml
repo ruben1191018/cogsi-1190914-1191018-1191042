@@ -1,0 +1,169 @@
+<project name="SampleProject" default="resolve" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <property name="src.dir" value="src/main/java"/>
+    <property name="build.dir" value="build"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="test.classes.dir" value="${build.dir}/test-classes"/> <!-- Test classes directory -->
+    <property name="jar.dir" value="${build.dir}/libs"/>
+    <property name="main-class" value="payroll.PayrollApplication"/>
+    <property name="backup.dir" value="backup"/> <!-- Backup directory -->
+    <property name="backup.temp.dir" value="${backup.dir}/temp"/> <!-- Temporary directory -->
+    <property name="backup.zip" value="${backup.dir}/source_backup.zip"/> <!-- Zip file path -->
+
+    <!-- Load Ivy tasks -->
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" />
+
+    <!-- Define where Ivy configurations are located -->
+    <target name="init">
+        <mkdir dir="lib"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${test.classes.dir}"/> <!-- Test classes directory -->
+        <mkdir dir="${jar.dir}"/>
+    </target>
+
+
+    <!-- Resolve dependencies using Ivy -->
+    <target name="resolve" depends="init">
+        <ivy:resolve file="ivy.xml" />
+        <ivy:retrieve pattern="lib/[conf]/[artifact]-[type]-[revision].[ext]" />
+    </target>
+
+    <!-- Compile the source code -->
+    <target name="compile" depends="init">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false">
+            <compilerarg value="--release"/>
+            <compilerarg value="17"/> <!-- Java 17 -->
+            <classpath>
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="compileTests" depends="init">
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" includeantruntime="false">
+            <compilerarg value="--release"/>
+            <compilerarg value="17"/> <!-- Java 17 -->
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="${jar.dir}/basic_demo.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- Run the chat server -->
+
+    <target name="runApplication" depends="jar">
+        <java classname="payroll.PayrollApplication" fork="true" failonerror="true">
+            <classpath>
+                <!-- Include the compiled jar -->
+                <pathelement path="${jar.dir}/basic_demo.jar"/>
+                <!-- Include all dependencies from the lib folder -->
+                <fileset dir="lib" includes="*.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <!-- Target to clean the backup directory (optional) -->
+    <target name="cleanBackup">
+        <echo message="Cleaning backup directory..."/>
+        <delete dir="${backup.temp.dir}" failonerror="false"/>
+        <delete file="${backup.zip}" failonerror="false"/>
+    </target>
+
+    <!-- Target to create backup directories -->
+    <target name="createBackupDirs" depends="cleanBackup">
+        <echo message="Creating backup directory..."/>
+        <mkdir dir="${backup.temp.dir}"/>
+    </target>
+
+    <!-- Target to copy source code to a temporary backup directory -->
+    <target name="copySourceCode" depends="createBackupDirs">
+        <echo message="Copying source code to temporary backup directory..."/>
+        <copy todir="${backup.temp.dir}">
+            <fileset dir="${src.dir}"/>
+        </copy>
+    </target>
+
+    <!-- Target to zip the copied source code -->
+    <target name="zipSourceCode" depends="copySourceCode">
+        <echo message="Zipping the source code to ${backup.zip}..."/>
+        <zip destfile="${backup.zip}">
+            <fileset dir="${backup.temp.dir}"/>
+        </zip>
+    </target>
+
+    <!-- Custom task that handles the full backup process -->
+    <target name="backup" depends="zipSourceCode">
+        <echo message="Backup complete! Zip file is located at ${backup.zip}"/>
+    </target>
+
+    <path id="project.classpath">
+        <pathelement path="${build.dir}/classes"/>
+
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+    <property name="javadoc.dir" value="${build.dir}/javadoc"/>
+    <!-- Task to generate Javadoc -->
+    <target name="generateJavadoc">
+        <!-- Create the directory for the generated Javadoc -->
+        <mkdir dir="${javadoc.dir}"/>
+
+        <!-- Generate the Javadoc -->
+        <javadoc destdir="${javadoc.dir}" sourcepath="${src.dir}" classpathref="project.classpath">
+            <!-- Optional: set the package names to include -->
+            <packageset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </packageset>
+        </javadoc>
+
+        <echo message="Javadoc generated in ${javadoc.dir}"/>
+    </target>
+
+    <property name="zip.name" value="javadoc.zip"/>
+    <target name="packageJavadoc" depends="generateJavadoc">
+        <mkdir dir=""/>
+
+        <zip destfile="${zip.name}">
+            <fileset dir="${javadoc.dir}"/>
+        </zip>
+
+        <echo message="Javadoc packaged into /${zip.name}"/>
+    </target>
+
+    <property name="test.src.dir" value="src/test/java/payroll"/> <!-- Test source directory -->
+    <property name="test.classes.dir" value="${build.dir}/test-classes"/> <!-- Test classes directory -->
+    <!-- Run JUnit tests -->
+    <target name="test" depends="compileTests">
+        <mkdir dir="${build.dir}/test-reports"/>
+        <junit printsummary="on" haltonfailure="yes" haltonerror="yes" fork="true" showoutput="true">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <pathelement path="${test.classes.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <formatter type="plain"/>
+            <batchtest todir="${build.dir}/test-reports">
+                <fileset dir="${test.classes.dir}">
+                    <include name="**/*Test.class"/> <!-- Include test classes -->
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+</project>
