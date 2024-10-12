@@ -1,0 +1,122 @@
+<project name="Basic Demo" default="jar" basedir=".">
+    <!-- Set global properties for this build -->
+    <property name="src.dir" value="src/main/java"/>
+    <property name="test.src.dir" value="src/test/basic_demo"/> <!-- Test source directory -->
+    <property name="build.dir" value="build"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="test.classes.dir" value="${build.dir}/test-classes"/> <!-- Test classes directory -->
+    <property name="jar.dir" value="${build.dir}/libs"/>
+    <property name="main-class" value="basic_demo.App"/>
+    <property name="client-main-class" value="basic_demo.ChatClientApp"/>
+
+    <!-- Initialize build directories -->
+    <target name="init">
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${test.classes.dir}"/> <!-- Test classes directory -->
+        <mkdir dir="${jar.dir}"/>
+    </target>
+
+    <!-- Compile the source code -->
+    <target name="compile" depends="init">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false">
+            <compilerarg value="--release"/>
+            <compilerarg value="17"/> <!-- Java 17 -->
+            <classpath>
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- Compile the test classes -->
+    <target name="compileTests" depends="init">
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" includeantruntime="false">
+            <compilerarg value="--release"/>
+            <compilerarg value="17"/> <!-- Java 17 -->
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- Create the JAR file -->
+    <target name="jar" depends="compile">
+        <jar destfile="${jar.dir}/basic_demo.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- Run the chat server -->
+    <target name="runServer" depends="jar">
+        <java classname="basic_demo.ChatServerApp" fork="true" failonerror="true">
+            <classpath>
+                <pathelement path="${jar.dir}/basic_demo.jar"/>
+                <fileset dir="${lib.dir}">
+                    <include name="log4j-api-2.24.1.jar"/>
+                    <include name="log4j-core-2.24.1.jar"/>
+                </fileset>
+            </classpath>
+            <arg value="59001"/> <!-- Server Port -->
+        </java>
+    </target>
+
+    <!-- Run the chat client -->
+    <target name="runClient" depends="compile">
+        <java classname="${client-main-class}" fork="true" failonerror="true">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+            <arg value="localhost"/>
+            <arg value="59001"/> <!-- Default port -->
+        </java>
+    </target>
+
+    <!-- Run JUnit tests -->
+    <target name="test" depends="compileTests">
+        <mkdir dir="${build.dir}/test-reports"/>
+        <junit printsummary="on" haltonfailure="yes" haltonerror="yes" fork="true" showoutput="true">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <pathelement path="${test.classes.dir}"/>
+                <fileset dir="${lib.dir}">
+                    <!-- Add JUnit and its dependencies to the classpath -->
+                    <include name="junit-platform-console-standalone-1.9.2.jar"/>
+                </fileset>
+            </classpath>
+            <formatter type="plain"/>
+            <batchtest todir="${build.dir}/test-reports">
+                <fileset dir="${test.classes.dir}">
+                    <include name="**/*Test.class"/> <!-- Include test classes -->
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+    <!-- Backup the sources -->
+    <target name="backup" description="Backup the source files">
+        <mkdir dir="backups"/> <!-- Ensure backup directory exists -->
+        <copy todir="backups">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/> <!-- Include all Java source files -->
+            </fileset>
+        </copy>
+        <echo message="Backup completed! Sources are copied to the backup directory."/>
+    </target>
+
+    <target name="zipBackup" depends="backup" description="Create a zip archive of the backup">
+        <zip destfile="backup.zip" basedir="b"/>
+        <echo message="Backup archive created at ${backup.zip}."/>
+    </target>
+</project>
