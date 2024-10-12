@@ -303,7 +303,7 @@ To run the server, you just need to use the following command:
 
 ### Step 2- Adding Unit Tests and Configuring Ant for JUnit
 
-Next, we set up unit testing using JUnit in Ant. For this, I created a target named test 
+Next, we set up unit testing using JUnit in Ant. For this, we created a target named test 
 which compiles the test classes and runs them using the junit task:
 
 
