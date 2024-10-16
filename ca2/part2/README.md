@@ -5,15 +5,15 @@
 In the empty directory we used the gradle init command to create a Gradle Project
 The following options were shown:
 
-![img.png](pictures/gradleinit1.png)
+![img.png](../pictures/gradleinit1.png)
 
 We selected "Application" (1)
 
-![img.png](pictures/gradleinit2.png)
+![img.png](../pictures/gradleinit2.png)
 
 Then selected "Java" (1)
 
-![img_1.png](pictures/gradleinit3.png)
+![img_1.png](../pictures/gradleinit3.png)
 
 For the application structure we went with Single Application Project (1) since we don't want to create a library
 We used Groovy (2) as the build script DSL following the same structure as the first part
@@ -25,7 +25,7 @@ After having the base Gradle project we replaced the *src* folder with the one f
 
 Some dependencies were missing, so we added the same dependencies from the pom.xml into the build.gradle file:
 
-![img.png](pictures/gradle_dependencies.png)
+![img.png](../pictures/gradle_dependencies.png)
 
 
 We had to add plugins and dependencies
@@ -43,7 +43,7 @@ After adding the plugins we added the same dependencies present in the pom.xml
 
 To zip source code and store in back up directory we added the new following task called backupSource:
 
-![img.png](pictures/backupSourceZip.png)
+![img.png](../pictures/backupSourceZip.png)
 
 This task is of type Zip meaning it compresses files into a zip file
 
@@ -83,7 +83,7 @@ To do this we added the new following task called runDistApp:
 
 - dependsOn installDist: This ensures that the installDist task is executed before the custom task (runDistApp). The installDist task generates the necessary distribution files and scripts under the build/install directory.
 
-![img.png](img.png)
+![img.png](../pictures/img.png)
 
 - org.gradle.internal.os.OperatingSystem.current(): This Gradle API helps in detecting the current operating system, which is used to choose the correct executable script (either .bat for Windows or .sh for Unix-based systems).
 
@@ -127,7 +127,7 @@ To do this we added the new following task called packageJavadoc:
 
 - archiveFileName = "javadoc.zip": This sets the name of the ZIP file that will be created.
 
-![img_1.png](img_1.png)
+![img_1.png](../pictures/img_1.png)
 
 ### Step 5 - Create a new source set for integration tests
 
@@ -150,10 +150,10 @@ This method clears all existing records from the database
 By resetting the database and populating it with fresh data, we ensure consistent test
 results.
 
-![img_3.png](img_3.png)
+![img_3.png](../pictures/img_3.png)
 
 After that we created a method to perform the Get All Orders and validate that the response was Ok 200.
-![img_2.png](img_2.png)
+![img_2.png](../pictures/img_2.png)
 
 
 ## Part 2 - Alternative(Ant)
@@ -169,30 +169,30 @@ In a new directory we created the build.xml file and an ivy.xml file.
 In the build.xml file we defined the ivy dependency using the following code:
 
 
-![img_4.png](img_4.png)
+![img_4.png](../pictures/img_4.png)
 
 The Ivy tasks were loaded, the path to where ivy configurations are located and where the ivy.xml file is located was also configured
 
 
 In the ivy.xml file we defined the dependencies we needed
 
-![img_5.png](img_5.png)
+![img_5.png](../pictures/img_5.png)
 
 
 After that we ran the "ant" command, to install all the dependencies needed
 
 In the same build.xml we added the compile and jar targets, to compile and create the jard for the application
 
-![img_6.png](img_6.png)
+![img_6.png](../pictures/img_6.png)
 
-![img_7.png](img_7.png)
+![img_7.png](../pictures/img_7.png)
 
 
 We ran the ant jar, that depends on the compile task, so it runs both targets
 
 To be able to run the application we added the following target, named runApplication
 
-![img_8.png](img_8.png)
+![img_8.png](../pictures/img_8.png)
 
 To run the application we just need to run the following command
 
@@ -207,7 +207,7 @@ To run this step, we just need to run the zipSourceCode target, that runs all th
 
     ant zipSourceCode
 
-![img_9.png](img_9.png)
+![img_9.png](../pictures/img_9.png)
 
 ### Step 3 -  Create a custom task that depends on the installDist task and runs the application using the generated distribution scripts
 
@@ -271,7 +271,7 @@ To run this step, we just need to run the zipSourceCode target, that runs all th
 We added an integration test that starts the application and performs a get to the all orders endpoint, validating the return code ( 200 Ok ) .
 Before the test validation, we cleaned the database and added two orders in the database. 
 
-![img_10.png](img_10.png)
+![img_10.png](../pictures/img_10.png)
 
 
 ### Step 2- Adding Unit Tests and Configuring Ant for JUnit
