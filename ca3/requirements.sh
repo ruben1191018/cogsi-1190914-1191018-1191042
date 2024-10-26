@@ -8,10 +8,10 @@ sudo apt-get upgrade -y
 sudo apt-get install -y git
 
 # Install OpenJDK (Java 11)
-sudo apt-get install -y openjdk-11-jdk
+sudo apt-get install -y openjdk-17-jdk
 
 # Set JAVA_HOME system-wide
-sudo bash -c 'echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" > /etc/profile.d/jdk.sh'
+sudo bash -c 'echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-arm64" > /etc/profile.d/jdk.sh'
 sudo bash -c 'echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> /etc/profile.d/jdk.sh'
 
 # Install Maven
