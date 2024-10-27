@@ -17,6 +17,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "requirements.sh"
   config.vm.network "forwarded_port", guest: 8080, host: 1010
   config.vm.network "forwarded_port", guest: 59001, host: 1011
+  config.vm.synced_folder "./h2data", "/home/vagrant/h2data"
 
   config.vm.provision "shell" do |s|
     s.env = {
