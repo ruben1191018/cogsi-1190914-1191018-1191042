@@ -1,10 +1,6 @@
 #!/bin/bash
 REPO_URL=https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git
 
-
-
-echo $START_CHAT_SERVICE
-
 if [ $CLONE_REPO == "true" ]; then
     echo "Cloning repository..."
     git clone $REPO_URL

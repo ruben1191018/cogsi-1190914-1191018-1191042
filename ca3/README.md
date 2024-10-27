@@ -2,6 +2,49 @@
 
 ## Part 1
 
+### You should start by creating a VM using Vagrant
+
+We started by running the following command for initializing a project to use a base image to quickly clone a VM:
+    vagrant init bento/ubuntu-20.04
+
+This command generates a vagrant file with all the initial configurations.
+
+To automate the installation of all necessary dependencies for the project, we created a shell script called requirements.sh. This script updates the package list, upgrades existing packages, and installs all required dependencies. The key packages installed are:
+    * git
+    * openjdk-17-jdk
+    * maven
+    * gradle
+
+We also set the JAVA_HOME variable.
+
+![alt text](images/requirments.png)
+
+After we built the script, we added the following command to the vagrant file:
+    config.vm.provision "shell", path: "requirements.sh"
+
+This setting instructs Vagrant to run the requirements.sh script automatically upon VM creation, ensuring that all dependencies are installed without manual intervention
+
+
+to validate that the VM setup and dependency installations were successful, we performed a series of commands:
+
+Start the VM - We used the command below to boot up the VM with all configurations and provisions specified in the Vagrantfile.
+    vagrant up
+
+Connect to the VM - After the VM was running, we connected to it using SSH with the following command:
+    vagrant ssh
+
+Verify Installed Dependencies - Once inside the VM, we ran specific version commands to confirm that each required dependency was correctly installed:   
+    git --version
+    java -version
+    gradle -v
+    mvn -version
+
+### Clone your group’s repository inside the VM
+
+After inside the machine, we cloned the repo using the following command:
+    git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git
+
+
 ### Interact with both applications from your host machine
 
 Both Building Rest Services with Spring project and Chat Application need to have the ports open to work
@@ -72,3 +115,38 @@ And for the final step:
     sudo systemctl daemon-reload
     sudo systemctl enable h2
     sudo systemctl start h2
+
+
+### Automate the cloning, building, and starting of applications
+
+To streamline the process of cloning, building, and launching applications, we developed a shell script named services.sh. This script allows us to automate each step required to set up and start essential services within the VM.
+
+
+First, we added the following configuration to the Vagrantfile to provision services.sh with specific environment variables:
+
+    config.vm.provision "shell" do |s|
+        s.env = {
+        "CLONE_REPO" => "true",
+        "START_REST_SERVICE" => "true",
+        "START_CHAT_SERVICE" => "true",
+        }
+        s.path = "services.sh"
+    end
+
+In this configuration, we defined three environment variables to control the behavior of services.sh:
+
+* CLONE_REPO: Determines whether the VM should clone the repository.
+* START_REST_SERVICE: Specifies whether the VM should start the REST service.
+* START_CHAT_SERVICE: Specifies whether the VM should start the chat service.
+
+These settings provide flexibility, enabling or disabling each action depending on the project’s requirements.
+
+This way the VM will run the services.sh before starting.
+
+The services.sh does the following steps:
+    * Clones the repo
+    * Builds and Starts the chat service in the background to allow to continue with the script.
+    * Builds and Starts the rest service in the background to allow to continue with the script.
+
+
+![alt text](images/services.png)
