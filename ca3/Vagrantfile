@@ -21,8 +21,8 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell" do |s|
     s.env = {
       "CLONE_REPO" => "true",
-      "BUILD_APP" => "true",
-      "START_SERVICE" => "true"
+      "START_REST_SERVICE" => "true",
+      "START_CHAT_SERVICE" => "true",
     }
     s.path = "services.sh"
   end
