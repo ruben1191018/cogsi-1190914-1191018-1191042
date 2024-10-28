@@ -1,0 +1,31 @@
+Vagrant.configure("2") do |config|
+
+    config.vm.define "app" do |app|
+        app.vm.box = "bento/ubuntu-20.04"
+
+        app.vm.provision "shell", path: "requirements.sh"
+        app.vm.network "forwarded_port", guest: 8080, host: 1010
+
+        app.vm.provision "shell" do |s|
+        s.env = {
+            "CLONE_REPO" => "true",
+            "START_REST_SERVICE" => "true",
+            "START_CHAT_SERVICE" => "false",
+        }
+        s.path = "services.sh"
+        end
+
+        # Add the provisioning script to configure Spring Boot properties
+        app.vm.provision "shell", path: "configure_spring.sh"
+    end
+
+    config.vm.define "db" do |db|
+        db.vm.box = "bento/ubuntu-20.04"
+
+        config.vm.synced_folder "./h2data", "/home/vagrant/h2data"
+
+        db.vm.provision "shell", path: "install_h2.sh"
+        db.vm.network "forwarded_port", guest: 9092, host: 1011
+    end
+
+end
