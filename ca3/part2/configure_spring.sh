@@ -9,7 +9,7 @@ mkdir -p "$(dirname "$APP_PROPERTIES_PATH")"
 # Create or overwrite the application.properties file with H2 server mode settings
 cat <<EOL > "$APP_PROPERTIES_PATH"
 # H2 Database settings for server mode
-spring.datasource.url=jdbc:h2:tcp://192.168.50.5:9092/~/testdb
+spring.datasource.url=jdbc:h2:tcp://localhost:1011/./test
 spring.datasource.driverClassName=org.h2.Driver
 spring.datasource.username=sa
 spring.datasource.password=
