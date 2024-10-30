@@ -1,10 +1,15 @@
 Vagrant.configure("2") do |config|
 
+    config.dns.tld = "mydomain"
+    config.vm.hostname = "mymachine"
+
     config.vm.define "app" do |app|
         app.vm.box = "bento/ubuntu-20.04"
 
         app.vm.provision "shell", path: "requirements.sh"
-        app.vm.network "forwarded_port", guest: 8080, host: 1010
+        app.vm.network "private_network", type: "dhcp"
+        app.vm.hostname = "app"
+
 
         app.vm.provision "shell" do |s|
         s.env = {
@@ -16,7 +21,7 @@ Vagrant.configure("2") do |config|
         end
 
         # Add the provisioning script to configure Spring Boot properties
-        app.vm.provision "shell", path: "configure_spring.sh"
+        #pp.vm.provision "shell", path: "configure_spring.sh"
     end
 
     config.vm.define "db" do |db|
@@ -30,7 +35,11 @@ Vagrant.configure("2") do |config|
         #config.disksize.size = '5 GB'
 
         db.vm.provision "shell", path: "install_h2.sh"
-        db.vm.network "forwarded_port", guest: 9092, host: 1011
+        db.vm.network "forwarded_port", guest: 9092, host: 1013
+        db.vm.network "forwarded_port", guest: 8082, host: 1014
+
+        db.vm.hostname = "database"
+        db.vm.network "private_network", type: "dhcp"
     end
 
 end
