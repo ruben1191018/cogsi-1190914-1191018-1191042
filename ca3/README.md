@@ -2,14 +2,16 @@
 
 ## Part 1
 
-### You should start by creating a VM using Vagrant
+###  Create a VM using Vagrant
 
 We started by running the following command for initializing a project to use a base image to quickly clone a VM:
+    
     vagrant init bento/ubuntu-20.04
 
 This command generates a vagrant file with all the initial configurations.
 
 To automate the installation of all necessary dependencies for the project, we created a shell script called requirements.sh. This script updates the package list, upgrades existing packages, and installs all required dependencies. The key packages installed are:
+  
     * git
     * openjdk-17-jdk
     * maven
@@ -20,6 +22,7 @@ We also set the JAVA_HOME variable.
 ![alt text](images/requirments.png)
 
 After we built the script, we added the following command to the vagrant file:
+    
     config.vm.provision "shell", path: "requirements.sh"
 
 This setting instructs Vagrant to run the requirements.sh script automatically upon VM creation, ensuring that all dependencies are installed without manual intervention
@@ -28,24 +31,27 @@ This setting instructs Vagrant to run the requirements.sh script automatically u
 to validate that the VM setup and dependency installations were successful, we performed a series of commands:
 
 Start the VM - We used the command below to boot up the VM with all configurations and provisions specified in the Vagrantfile.
+    
     vagrant up
 
 Connect to the VM - After the VM was running, we connected to it using SSH with the following command:
+    
     vagrant ssh
 
 Verify Installed Dependencies - Once inside the VM, we ran specific version commands to confirm that each required dependency was correctly installed:   
+    
     git --version
     java -version
     gradle -v
     mvn -version
 
-### Clone your group’s repository inside the VM
+### Clone group’s repository inside the VM
 
 After inside the machine, we cloned the repo using the following command:
     git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git
 
 
-### Interact with both applications from your host machine
+### Interact with both applications from the host machine
 
 Both Building Rest Services with Spring project and Chat Application need to have the ports open to work
 So we need to forward ports to expose the VM's network
@@ -150,3 +156,23 @@ The services.sh does the following steps:
 
 
 ![alt text](images/services.png)
+
+### Ensure that your VMs are allocated sufficient resources
+To configure the CPU and memory we can use the following configurations in the vagrant file 
+
+The name of the machine is "db", in this case.
+
+We defined it to have 1024MB (1GB) of memory and 1 CPU.   
+
+![img.png](img.png)
+
+To change the disk size we had to install a new plugin called "vagrant-disksize"
+
+After the plugin was installed we used the following config: 
+
+    config.disksize.size = '5 GB'
+
+After adding the configurations we destroyed and created the VM again with the following commands
+    
+    vagrant destroy
+    vagrant up
