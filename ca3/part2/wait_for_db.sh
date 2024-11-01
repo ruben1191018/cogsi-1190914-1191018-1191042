@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DB_HOST="database"
+DB_HOST="database.mydomain"
 DB_PORT=9092  # Use the port exposed by H2 on the 'db' VM
 
 # Wait for H2 database to be ready

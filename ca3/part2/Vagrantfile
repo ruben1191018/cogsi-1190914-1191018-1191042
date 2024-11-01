@@ -25,12 +25,13 @@ Vagrant.configure("2") do |config|
         app.vm.box = "bento/ubuntu-20.04"
 
         app.vm.provision "shell", path: "requirements.sh"
-        app.vm.provision "shell", path: "configure_spring.sh"
+        #app.vm.provision "shell", path: "configure_spring.sh"
+        app.vm.network "forwarded_port", guest: 8080, host: 1010
         app.vm.network "private_network", type: "dhcp"
         app.vm.hostname = "app"
 
         app.vm.provision "shell", path: "wait_for_db.sh"
-
+        
 
         app.vm.provision "shell" do |s|
         s.env = {

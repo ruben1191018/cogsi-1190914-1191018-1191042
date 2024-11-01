@@ -28,6 +28,19 @@ fi
 
 if [ $START_REST_SERVICE == "true" ]; then
     echo "Building rest service..."
+
+    #!/bin/bash
+
+    mkdir cogsi-1190914-1191018-1191042/ca2/part2/app/src/main/resources
+
+    echo "spring.datasource.url=jdbc:h2:tcp://database.mydomain:9092/./test" > cogsi-1190914-1191018-1191042/ca2/part2/app/src/main/resources/application.properties
+    echo "spring.datasource.driverClassName=org.h2.Driver" >> cogsi-1190914-1191018-1191042/ca2/part2/app/src/main/resources/application.properties
+    echo "spring.datasource.username=sa" >>cogsi-1190914-1191018-1191042/ca2/part2/app/src/main/resources/application.properties
+    echo "spring.datasource.password=" >> cogsi-1190914-1191018-1191042/ca2/part2/app/src/main/resources/application.properties
+    echo "spring.jpa.hibernate.ddl-auto=update" >> cogsi-1190914-1191018-1191042/ca2/part2/app/src/main/resources/application.properties
+
+    echo "Configured application.properties for Spring Boot application to connect to H2 server on db VM."
+
     cd cogsi-1190914-1191018-1191042/ca2/part2/app
     gradle build
     
