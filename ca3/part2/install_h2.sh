@@ -6,8 +6,18 @@ sudo apt-get install -y wget unzip
 # Install OpenJDK (Java 17)
 sudo apt-get install -y openjdk-17-jdk
 
+sudo ufw allow 22/tcp
+
+ip_address=$(dig +short app.mydomain)
+
+# Allow traffic on port 9092 only from the app VM's IP
+sudo ufw allow from $ip_address to any port 9092
+
+# Enable the firewall
+sudo ufw --force enable
+
 # Set JAVA_HOME system-wide
-sudo bash -c 'echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" > /etc/profile.d/jdk.sh'
+sudo bash -c 'echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-arm64" > /etc/profile.d/jdk.sh'
 sudo bash -c 'echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> /etc/profile.d/jdk.sh'
 
 wget https://github.com/h2database/h2database/releases/download/version-2.3.230/h2-2024-07-15.zip -P /tmp
