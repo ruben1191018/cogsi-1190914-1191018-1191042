@@ -3,6 +3,15 @@ Vagrant.configure("2") do |config|
     config.dns.tld = "mydomain"
     config.vm.hostname = "mymachine"
 
+    # Copy public SSH key to VM
+    config.vm.provision "file", source: "my_vagrant_key.pub", destination: "~/.ssh/authorized_keys"
+
+    # Paths to the private key
+    config.ssh.private_key_path = ["my_vagrant_key", "~/.vagrant.d/insecure_private_key"]
+
+    # Disable Vagrant's default insecure key insertion
+    config.ssh.insert_key = false
+
     config.vm.define "db" do |db|
         db.vm.box = "bento/ubuntu-20.04"
 
