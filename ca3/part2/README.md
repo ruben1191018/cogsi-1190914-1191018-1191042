@@ -9,6 +9,18 @@ For this step, first of all, we just split the vagrant file for two vms in vagra
 //To continue
 
 
+### By default, Spring Boot configures the application to connect to an in-memory store with the username sa and an empty password
+
+First to allow the connection between the two applications, started configuring the DHCP.
+We installed the plugin using the following command:
+    
+    vagrant plugin install vagrant-dns
+
+Then we configured the vagrant file     
+
+
+
+
 ### Ensure that your VMs are allocated sufficient resources
 
 To configure the CPU and memory we can use the following configurations in the vagrant file
@@ -30,6 +42,30 @@ After adding the configurations we destroyed and created the VM again with the f
     vagrant destroy
     vagrant up
 
+### Ensure that you use custom SSH keys for a secure access
+
+First, we generated an SSH key pair (public and private) using the ssh-keygen command. This command creates a 2048-bit RSA key that will be used for authentication with the virtual machine:
+  
+    ssh-keygen -t rsa -b 2048 -f ~/.ssh/my_vagrant_key
+
+This command saves the keys in the ~/.ssh directory:
+  * Private key: ~/.ssh/my_vagrant_key
+  * Public key: ~/.ssh/my_vagrant_key.pub
+
+After creating the SSH keys, we updated the Vagrantfile with the following settings to define how Vagrant should handle SSH keys:
+      
+    # Copy public SSH key to VM
+    config.vm.provision "file", source: "my_vagrant_key.pub", destination: "~/.ssh/authorized_keys"
+
+    # Paths to the private key
+    config.ssh.private_key_path = ["my_vagrant_key", "~/.vagrant.d/insecure_private_key"]
+
+    # Disable Vagrant's default insecure key insertion
+    config.ssh.insert_key = false
+
+We started by copying the public SSH key to the virtual machine’s authorized_keys file, which enables SSH authentication with the public key.
+Then we specified that Vagrant should use our custom private key (my_vagrant_key) for SSH connections, indicating the path.
+And disabled the vagrant's default insecure key insertion preventing Vagrant from automatically injecting its default insecure key into the virtual machine, enhancing security by ensuring only our custom key is used for SSH authentication.
 
 ### Secure the db VM by adding firewall rules to restrict access only to the app VM
 
