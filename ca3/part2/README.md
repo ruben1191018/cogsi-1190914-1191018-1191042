@@ -16,9 +16,30 @@ We installed the plugin using the following command:
     
     vagrant plugin install vagrant-dns
 
-Then we configured the vagrant file     
+Next, we updated the Vagrantfile to include the necessary DNS configurations. We added the following settings:
+
+    config.dns.tld = ”mydomain"
+    config.vm.hostname = ”mymachine"
+
+For application-specific configurations, we set up the hostnames as follows:
+* For the app server:
+     app.vm.hostname = "app"
+
+* For the db server:  
+    db.vm.hostname = "database"
 
 
+After running the vagrant up command, we proceeded to register the DNS server with the following command:
+
+  vagrant dns --install
+
+Then, we started the DNS server:
+
+   vagrant dns --start
+
+With the DNS server up and running, we connected to the database from the application server.
+
+![alt text](image.png)
 
 
 ### Ensure that your VMs are allocated sufficient resources
