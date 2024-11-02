@@ -1,0 +1,5 @@
+2024-10-27 15:49:57.738849Z jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE a\000a[*]ls\000a"; SQL statement:
+CREATE TABLE a
+ls
+ [42000-230]
