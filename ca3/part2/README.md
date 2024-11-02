@@ -127,6 +127,44 @@ We started by copying the public SSH key to the virtual machine’s authorized_k
 Then we specified that Vagrant should use our custom private key (my_vagrant_key) for SSH connections, indicating the path.
 And disabled the vagrant's default insecure key insertion preventing Vagrant from automatically injecting its default insecure key into the virtual machine, enhancing security by ensuring only our custom key is used for SSH authentication.
 
+### Automate the startup process so that the Spring Boot application waits for the H2 database to be ready
+
+To automate the startup process so that the Spring Boot application on the app VM waits for the H2 database 
+on the db VM to be ready, we made some changes to the configuration and added a new script:
+
+- We ensured that the **db VM** boots before the app VM by defining db before app in the Vagrantfile. 
+This allows the H2 database to initialize before the Spring Boot application tries to connect.
+- Besides that, we created a shell script called wait_for_db.sh that pings the H2 database to confirm 
+it’s ready before allowing the Spring Boot application to start. This script is configured to wait for a 
+successful connection to the database by testing its hostname and port.
+
+
+    #!/bin/bash
+
+    DB_HOST="database.mydomain"
+    DB_PORT=9092  # Use the port exposed by H2 on the 'db' VM
+
+    # Wait for H2 database to be ready
+    while ! nc -z $DB_HOST $DB_PORT; do
+        echo "Waiting for H2 database to be ready..."
+        sleep 5
+    done
+
+    echo "H2 database is ready!"
+
+- This script repeatedly checks the database's hostname (database.mydomain) and port (9092) using nc -z.
+- If the database is not reachable, the script waits for 5 seconds and checks again.
+- Once the database responds, the script outputs that the database is ready and exits.
+
+We included wait_for_db.sh in the app VM’s provisioning steps in the Vagrantfile
+
+        
+    app.vm.provision "shell", path: "wait_for_db.sh"
+
+This ensures that, during the app VM’s setup process, it first runs the wait_for_db.sh script to check if 
+the H2 database is reachable before proceeding to start the Spring Boot application.
+
+
 ### Secure the db VM by adding firewall rules to restrict access only to the app VM
 
 We added the following commands to the install_h2.sh:
