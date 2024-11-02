@@ -26,7 +26,7 @@ In the App VM, we modified the environment variables in services.sh:
 - Set "START_CHAT_SERVICE" to false since the chat service was not needed.
 - Kept "START_REST_SERVICE" as true to start only the REST service in line with the current focus on the Spring Boot application.
 
-![img.png](img.png)
+![img.png](images/img.png)
 
 
 ### By default, Spring Boot configures the application to connect to an in-memory store with the username sa and an empty password
@@ -43,23 +43,29 @@ Next, we updated the Vagrantfile to include the necessary DNS configurations. We
 
 For application-specific configurations, we set up the hostnames as follows:
 * For the app server:
-     app.vm.hostname = "app"
+
+
+    app.vm.hostname = "app"
 
 * For the db server:  
+    
+
     db.vm.hostname = "database"
 
 
 After running the vagrant up command, we proceeded to register the DNS server with the following command:
 
-  vagrant dns --install
+  
+    vagrant dns --install
 
 Then, we started the DNS server:
 
-   vagrant dns --start
+   
+    vagrant dns --start
 
 With the DNS server up and running, we connected to the database from the application server.
 
-![alt text](image.png)
+![alt text](images/image.png)
 
 With the two VMs communicating, we moved on to configuring the Spring Boot application to connect to the H2 
 database running on the db VM in server mode.
@@ -71,13 +77,13 @@ We modified requirements.sh to include database connection details directly into
 This script now automatically configures the Spring Boot application to connect to the 
 H2 server on the database VM.
 
-![img_1.png](img_1.png)
+![img_1.png](images/img_1.png)
 
 With this change, now the APP is connected to the H2 database running in the other virtual machine as you can see in this print:
 
-![img_2.png](img_2.png)
+![img_2.png](images/img_2.png)
 
-![img_3.png](img_3.png)
+![img_3.png](images/img_3.png)
 
 
 
@@ -138,22 +144,7 @@ This allows the H2 database to initialize before the Spring Boot application tri
 it’s ready before allowing the Spring Boot application to start. This script is configured to wait for a 
 successful connection to the database by testing its hostname and port.
 
-
-    #!/bin/bash
-
-    DB_HOST="database.mydomain"
-    
-    DB_PORT=9092  # Use the port exposed by H2 on the 'db' VM
-
-    while ! nc -z $DB_HOST $DB_PORT; do
-    
-    echo "Waiting for H2 database to be ready..."
-    
-    sleep 5
-    
-    done
-
-    echo "H2 database is ready!"
+![img_4.png](images/img_4.png)
 
 - This script repeatedly checks the database's hostname (database.mydomain) and port (9092) using nc -z.
 - If the database is not reachable, the script waits for 5 seconds and checks again.
