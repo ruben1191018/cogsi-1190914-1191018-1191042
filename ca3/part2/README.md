@@ -61,6 +61,23 @@ With the DNS server up and running, we connected to the database from the applic
 
 ![alt text](image.png)
 
+With the two VMs communicating, we moved on to configuring the Spring Boot application to connect to the H2 
+database running on the db VM in server mode.
+
+To accomplish this, we needed to edit the requirements.sh script to generate an application.properties file with 
+the correct database connection settings.
+
+We modified requirements.sh to include database connection details directly into application.properties. 
+This script now automatically configures the Spring Boot application to connect to the 
+H2 server on the database VM.
+
+![img_1.png](img_1.png)
+
+With this change, now the APP is connected to the H2 database running in the other virtual machine as you can see in this print:
+
+![img_2.png](img_2.png)
+
+![img_3.png](img_3.png)
 
 
 
@@ -72,7 +89,7 @@ The name of the machine is "db", in this case.
 
 We defined it to have 1024MB (1GB) of memory and 1 CPU.
 
-![img.png](images/img.png)
+![memory.png](images%2Fmemory.png)
 
 To change the disk size we had to install a new plugin called "vagrant-disksize"
 
