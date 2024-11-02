@@ -4,14 +4,34 @@
 
 ### One VM should host the Spring application (app), while the other should host the H2 database (db)
 
-For this step, first of all, we just split the vagrant file for two vms in vagrant file.
+To meet the requirement of separating the Spring Boot application and the H2 database onto different VMs, we made the following adjustments:
 
-//To continue
+1. Split into Two VMs: app and db
+#### App VM (app):
+- Hosts the Spring Boot application.
+- Forwarded Port: Guest port 8080 (Spring Boot service) to host port 1010.
+- Provisioning: Runs requirements.sh to install dependencies and configures environment variables for service management through services.sh.
+- New Configuration: Added configure_spring.sh to customize Spring Boot properties as needed.
+
+#### DB VM (db):
+- Hosts the H2 database, creating a dedicated environment for data storage.
+- Forwarded Port: Guest port 9092 to host port 1011, allowing the Spring Boot application to connect to the database.
+- Synced Folder: Added a synced folder (./h2data on the host and /home/vagrant/h2data on the VM) to persist database files.
+- Provisioning: Runs install_h2.sh to set up H2, create a startup script, and configure it as a systemd service.
+
+2. Environment Variable Changes
+
+In the App VM, we modified the environment variables in services.sh:
+
+- Set "START_CHAT_SERVICE" to false since the chat service was not needed.
+- Kept "START_REST_SERVICE" as true to start only the REST service in line with the current focus on the Spring Boot application.
+
+![img.png](img.png)
 
 
 ### By default, Spring Boot configures the application to connect to an in-memory store with the username sa and an empty password
 
-First to allow the connection between the two applications, started configuring the DHCP.
+First to allow the connection between the two applications, we started configuring the DHCP.
 We installed the plugin using the following command:
     
     vagrant plugin install vagrant-dns
@@ -40,6 +60,8 @@ Then, we started the DNS server:
 With the DNS server up and running, we connected to the database from the application server.
 
 ![alt text](image.png)
+
+
 
 
 ### Ensure that your VMs are allocated sufficient resources
