@@ -1,0 +1,126 @@
+---
+- hosts: db
+  become: true
+  tasks:
+    - name: Update apt package manager
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+        update_cache: yes
+
+    - name: Create application directory
+      become: true
+      block:
+        - name: Create directory
+          file: 
+            path: /opt/h2
+            state: directory
+            mode: '0770'
+            group: developers
+      rescue:
+        - name: Log directory creation failure
+          debug:
+            msg: "Failed to create /opt/h2 with group developers."
+
+
+      
+
+    - name: Install required packages
+      apt:
+        name:
+          - wget
+          - unzip
+        state: present
+
+    - name: Check if Java is installed
+      command: java -version
+      register: java_installed
+      ignore_errors: yes
+
+    - name: Install OpenJDK 17
+      apt:
+        name: openjdk-17-jdk
+        state: present
+      when: java_installed.rc != 0
+
+    - name: Set JAVA_HOME in system-wide profile
+      copy:
+        dest: /etc/profile.d/jdk.sh
+        content: |
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-$(uname -m)
+          export PATH=$JAVA_HOME/bin:$PATH
+
+    - name: Set permissions on JAVA_HOME profile script
+      file:
+        path: /etc/profile.d/jdk.sh
+        mode: "0755"
+
+    - name: Source JAVA_HOME and PATH for the current session
+      shell: sh /etc/profile.d/jdk.sh
+
+    - name: Download H2 Database zip file
+      get_url:
+        url: https://github.com/h2database/h2database/releases/download/version-2.3.230/h2-2024-07-15.zip
+        dest: /tmp/h2-2024-07-15.zip
+
+    - name: Unzip H2 Database into /home/vagrant/
+      unarchive:
+        src: /tmp/h2-2024-07-15.zip
+        dest: /home/vagrant/
+        remote_src: yes
+
+    - name: Create H2 startup script
+      copy:
+        dest: /home/vagrant/start_h2.sh
+        content: |
+          #!/bin/bash
+          java -cp /home/vagrant/h2/bin/h2*.jar org.h2.tools.Server -tcp -tcpAllowOthers -baseDir /opt/h2
+
+    - name: Set permissions on H2 startup script
+      file:
+        path: /home/vagrant/start_h2.sh
+        mode: "0755"
+
+
+    - name: Create systemd service file for H2
+      copy:
+        dest: /etc/systemd/system/h2.service
+        content: |
+          [Unit]
+          Description=H2 Database Service
+          After=network.target
+
+          [Service]
+          ExecStart=/home/vagrant/start_h2.sh
+          User=vagrant
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Set permissions on H2 startup script
+      file:
+        path: /etc/systemd/system/h2.service
+        mode: "0755"
+
+    - name: Reload systemd to recognize the new service
+      command: sudo systemctl daemon-reload
+
+    - name: Enable H2 service
+      systemd:
+        name: h2
+        enabled: true
+        state: started
+
+    - name: Check H2 service status
+      command: sudo systemctl status h2
+      register: h2_status
+      ignore_errors: yes
+      failed_when: "'active (running)' not in h2_status.stdout"
+
+    - name: Print H2 service status
+      debug:
+        var: h2_status.stdout
