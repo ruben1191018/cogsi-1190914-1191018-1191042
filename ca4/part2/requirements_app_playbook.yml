@@ -1,0 +1,87 @@
+---
+- name: Provision server with development tools
+  hosts: all
+  become: true
+  tasks:
+    - name: Update and upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+    - name: Install OpenJDK 17
+      apt:
+        name: openjdk-17-jdk
+        state: present
+
+    - name: Set JAVA_HOME environment variable
+      copy:
+        dest: /etc/profile.d/jdk.sh
+        content: |
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-arm64
+          export PATH=$JAVA_HOME/bin:$PATH
+        mode: '0755'
+
+    - name: Install Maven
+      apt:
+        name: maven
+        state: present
+
+    - name: Install dependencies for Gradle
+      apt:
+        name:
+          - wget
+          - unzip
+        state: present
+
+    - name: Download Gradle
+      get_url:
+        url: https://services.gradle.org/distributions/gradle-8.4-bin.zip
+        dest: /tmp/gradle-8.4-bin.zip
+
+    - name: Create /opt/gradle directory
+      file:
+        path: /opt/gradle
+        state: directory
+        mode: '0755'    
+
+    - name: Unzip Gradle to /opt/gradle
+      unarchive:
+        src: /tmp/gradle-8.4-bin.zip
+        dest: /opt/gradle
+        remote_src: yes
+
+    - name: Create symlink for Gradle
+      file:
+        src: /opt/gradle/gradle-8.4/bin/gradle
+        dest: /usr/bin/gradle
+        state: link
+
+    - name: Verify Git installation
+      shell: git --version
+      register: git_version
+
+    - name: Verify Java installation
+      shell: java -version
+      register: java_version
+      ignore_errors: yes
+
+    - name: Verify Maven installation
+      shell: mvn -version
+      register: maven_version
+
+    - name: Verify Gradle installation
+      shell: gradle -v
+      register: gradle_version
+
+    - name: Display installation results
+      debug:
+        msg:
+          - "Git version: {{ git_version.stdout }}"
+          - "Java version: {{ java_version.stdout }}"
+          - "Maven version: {{ maven_version.stdout }}"
+          - "Gradle version: {{ gradle_version.stdout }}"

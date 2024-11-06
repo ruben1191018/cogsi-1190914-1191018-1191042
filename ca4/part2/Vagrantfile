@@ -1,7 +1,7 @@
 Vagrant.configure("2") do |config|
 
-    #config.dns.tld = "mydomain"
-    #config.vm.hostname = "mymachine"
+    config.dns.tld = "mydomain"
+    config.vm.hostname = "mymachine"
 
     # Copy public SSH key to VM
     #config.vm.provision "file", source: "my_vagrant_key.pub", destination: "~/.ssh/authorized_keys"
@@ -42,16 +42,19 @@ Vagrant.configure("2") do |config|
     config.vm.define "app" do |app|
         app.vm.box = "bento/ubuntu-20.04"
 
-        #app.vm.provision "shell", path: "requirements.sh"
-        #app.vm.provision "shell", path: "configure_spring.sh"
-        app.vm.network "forwarded_port", guest: 8080, host: 1015
-        #app.vm.network "private_network", type: "dhcp"
-        #app.vm.hostname = "app"
+        app.vm.network "forwarded_port", guest: 8080, host: 1010
+        app.vm.network "private_network", type: "dhcp"
+        app.vm.hostname = "app"
 
-        #app.vm.provision "shell", path: "wait_for_db.sh"
+        app.vm.provision "ansible" do |ansible|
+            ansible.playbook = "./requirements_app_playbook.yml"
+            ansible.compatibility_mode = "2.0"
+        end
 
+        app.vm.provision "ansible" do |ansible|
+            ansible.playbook = "./app_playbook.yml"
+            ansible.compatibility_mode = "2.0"
+        end
 
-        # Add the provisioning script to configure Spring Boot properties
-        #pp.vm.provision "shell", path: "configure_spring.sh"
     end
 end
