@@ -289,3 +289,39 @@ Therefore, apt: name=openjdk-17-jdk is only executed when java_installed.rc != 0
 Idempotency:
 
 This approach ensures idempotency: the task to install OpenJDK 17 will only run if it is actually needed (i.e., when Java is missing). If Java is already present, the when condition prevents unnecessary installation, leaving the system unchanged.
+
+
+### Alternative technological solution for the configuration management tool
+
+The alternative chosen was Puppet. Comparison between both tools
+
+
+1. Language and Approach
+ - Ansible:
+    * Uses YAML for its playbooks, which are easy to read and write.
+    * Follows an agentless approach, using SSH for communication with managed nodes.
+- Puppet:
+    * Uses its own domain-specific language (DSL), which is more complex and has a steeper learning curve compared to YAML.
+    * Operates with an agent-based architecture, where managed nodes run a Puppet agent that communicates with a central Puppet server (Puppet Master).
+
+2. Configuration Management Features
+- Ansible:
+
+    * Provides ad-hoc task execution and configuration management.
+    * Strong support for orchestration, allowing for detailed automation of multi-step processes.
+    * Lacks an automatic rollback feature; tasks are typically idempotent but require explicit error handling for advanced rollbacks.
+
+- Puppet:
+
+    * Excels in enforcing desired state; once a configuration is applied, Puppet ensures the system maintains that state.
+    * Comes with a built-in reporting and compliance feature, which helps in monitoring and auditing.
+    * Offers robust versioning and configuration rollbacks, which can simplify handling complex environments.
+
+3. Scalability and Performance
+- Ansible:
+
+    * Scalability can be achieved through external tools like Ansible Tower (AWX).
+    * More lightweight due to its agentless nature but may face performance issues with complex tasks over a large number of nodes.
+- Puppet:
+    * Naturally more scalable due to its agent-server model, which supports thousands of nodes efficiently.
+    * Can manage large-scale deployments with PuppetDB for tracking resources and configurations.
