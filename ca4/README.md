@@ -8,7 +8,7 @@ To start this part of the assignment, we had to define in the VagrantFile this p
 
 ![img_1.png](img_1.png)
 
-And remove this lines:
+And remove these lines:
 
 ![img_3.png](img_3.png)
 
@@ -21,7 +21,7 @@ This changes were for the app VM and for the DB VM
 Now showing the app_playbook that we created: 
 ![img_2.png](img_2.png)
 
-As you can see in this playbook, it is able to automate the deployment and 
+As we can see in this playbook, it is able to automate the deployment and 
 execution of a Spring REST service on a specified host. It creates an 
 application directory, clones the necessary Git repository, builds the 
 service using Gradle, and then starts it in the background.
@@ -228,6 +228,64 @@ guess or brute-force user passwords.
 
 
 
+## Ensure that playbooks are idempotent
+
+Idempotency is a key concept in Ansible, meaning that playbooks can be run multiple times without causing unintended changes or side effects if the desired state is already achieved. To ensure idempotency and robust error handling, we made some changes in the Ansible playbooks.
+
+Many Ansible modules are designed to be idempotent by default, meaning they check the current state before making any changes. 
+Example: Creating a Directory
+
+        - name: Create directory
+          file: 
+            path: /opt/h2
+            state: directory
+            mode: '0770'
+            group: developers
+
+The file module will check if the directory exists and matches the defined mode, group, and ownership before making any changes.
+
+### Using ignore_erros
+
+    - name: Check if Java is installed
+      command: java -version
+      register: java_installed
+      ignore_errors: yes
+
+ignore_errors: yes in a task can help ensure idempotency—the property where running a task multiple times produces the same result each time—by preventing errors from disrupting the rest of the playbook
+
+Without ignore_errors: yes, if Java is not installed, Ansible will stop execution at this task due to the error
+By using ignore_errors: yes, the playbook can continue running regardless of whether Java is installed
 
 
+### Using failed_when
 
+    - name: Check H2 service status
+      command: sudo systemctl status h2
+      register: h2_status
+      ignore_errors: yes
+      failed_when: "'active (running)' not in h2_status.stdout"
+
+The failed_when condition allows to override Ansible’s default failure behavior. By default, the task would fail if systemctl status h2 returns a non-zero exit code, which happens if the H2 service is not running.
+Instead, with failed_when: "'active (running)' not in h2_status.stdout", we're defining failure based on the absence of the phrase "active (running)" in the command’s output, rather than the command’s exit code.
+
+### Using when
+
+    - name: Check if Java is installed
+      command: java -version
+      register: java_installed
+      ignore_errors: yes
+
+    - name: Install OpenJDK 17
+      apt:
+        name: openjdk-17-jdk
+        state: present
+      when: java_installed.rc != 0
+
+The second task, Install OpenJDK 17, is set to run only if Java is not installed. The when condition java_installed.rc != 0 checks the return code (rc) from the previous command:
+        If Java is not installed, java -version will fail, and java_installed.rc will be non-zero (typically 1).
+        If Java is installed, java -version succeeds, and java_installed.rc will be 0.
+Therefore, apt: name=openjdk-17-jdk is only executed when java_installed.rc != 0, meaning Java is missing on the system.
+
+Idempotency:
+
+This approach ensures idempotency: the task to install OpenJDK 17 will only run if it is actually needed (i.e., when Java is missing). If Java is already present, the when condition prevents unnecessary installation, leaving the system unchanged.
