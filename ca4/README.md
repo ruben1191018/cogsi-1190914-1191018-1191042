@@ -4,13 +4,13 @@
 
 To start this part of the assignment, we had to define in the VagrantFile this provisioning:
 
-![img.png](img.png)
+![img.png](images/img.png)
 
-![img_1.png](img_1.png)
+![img_1.png](images/img_1.png)
 
 And remove these lines:
 
-![img_3.png](img_3.png)
+![img_3.png](images/img_3.png)
 
     app.vm.provision "shell", path: "requirements.sh"
     app.vm.provision "shell", path: "configure_spring.sh"
@@ -19,7 +19,7 @@ With this new configuration in the vagrantFile, now we are not using a shell scr
 This changes were for the app VM and for the DB VM
 
 Now showing the app_playbook that we created: 
-![img_2.png](img_2.png)
+![img_2.png](images/img_2.png)
 
 As we can see in this playbook, it is able to automate the deployment and 
 execution of a Spring REST service on a specified host. It creates an 
@@ -28,10 +28,10 @@ service using Gradle, and then starts it in the background.
 
 Now showing the db_playbook:
 
-![img_10.png](img_10.png)
-![img_11.png](img_11.png)
-![img_12.png](img_12.png)
-![img_13.png](img_13.png)
+![img_10.png](images/img_10.png)
+![img_11.png](images/img_11.png)
+![img_12.png](images/img_12.png)
+![img_13.png](images/img_13.png)
 
 The main purpose of this playbook is to set up an H2 database on a host 
 by updating packages, installing Java, and configuring H2. It creates 
@@ -157,7 +157,7 @@ In this task, our goal is to automate the process of enforcing a strong password
 
 To start, we configured the Vagrantfile to use Ansible for provisioning both virtual machines. The following configuration snippet enables Vagrant to run an Ansible playbook, common_playbook.yml, on both VMs. This setup ensures that the same password policies are applied across all instances automatically:
 
-![img_4.png](img_4.png)
+![img_4.png](images/img_4.png)
 
 By specifying compatibility_mode as “2.0,” we maintain compatibility with Ansible's newer syntax and playbook requirements.
 
@@ -218,13 +218,13 @@ members of this group only.
 
 This tasks that will be shown are from common_playbook
 
-![img_5.png](img_5.png)
+![img_5.png](images/img_5.png)
 
 The group module in Ansible is used to manage system groups. Here, we specify the group name as developers and set its state to present, meaning the group will be created if it doesn’t already exist.
 
 Next, we create the user devuser, who will be added to the developers group. This user will be granted access to the directories containing the application and database files.
 
-![img_6.png](img_6.png)
+![img_6.png](images/img_6.png)
 
 The user module is used here to create the user devuser. We set the following parameters:
 - name: Specifies the username, in this case, devuser.
@@ -250,7 +250,7 @@ This approach ensures that the password meets the complexity enforced by PAM and
 
 After creating the user, we add devuser to the developers group. This step ensures that the user has access to the directories and files restricted to this group.
 
-![img_7.png](img_7.png)
+![img_7.png](images/img_7.png)
 
 We use the user module again to modify the group memberships of devuser. The parameters are:
 - groups: Specifies the group to which the user should be added, in this case, developers.
@@ -259,10 +259,10 @@ We use the user module again to modify the group memberships of devuser. The par
 To ensure that the developers group were the only ones with the authorization to access the directory asked in the assignment, it was needed to add this specification in the app_playbook and the db_playbook:
 
 App:
-![img_9.png](img_9.png)
+![img_9.png](images/img_9.png)
 
 DB:
-![img_8.png](img_8.png)
+![img_8.png](images/img_8.png)
 
 To ensure only the developers group has authorization to access certain directories, we modified existing tasks
 in both the app_playbook and db_playbook to include the correct permissions and group ownership. Rather than
