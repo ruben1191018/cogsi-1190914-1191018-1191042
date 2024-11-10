@@ -19,6 +19,7 @@ With this new configuration in the vagrantFile, now we are not using a shell scr
 This changes were for the app VM and for the DB VM
 
 Now showing the app_playbook that we created: 
+
 ![img_2.png](images/img_2.png)
 
 As we can see in this playbook, it is able to automate the deployment and 
@@ -38,13 +39,7 @@ by updating packages, installing Java, and configuring H2. It creates
 necessary directories and scripts, sets up a systemd service for H2, and 
 starts the service, ensuring it runs continuously.
 
-The main purpose of this playbook is to set up an H2 database on a host
-by updating packages, installing Java, and configuring H2. It creates
-necessary directories and scripts, sets up a systemd service for H2, and
-starts the service, ensuring it runs continuously.
-
-
-Now explain some things about the playbook:
+Now explaining some things about the playbook:
 
     - name: Update apt package manager
       apt:
@@ -262,6 +257,7 @@ App:
 ![img_9.png](images/img_9.png)
 
 DB:
+
 ![img_8.png](images/img_8.png)
 
 To ensure only the developers group has authorization to access certain directories, we modified existing tasks
@@ -369,3 +365,9 @@ The alternative chosen was Puppet. Comparison between both tools
 - Puppet:
     * Naturally more scalable due to its agent-server model, which supports thousands of nodes efficiently.
     * Can manage large-scale deployments with PuppetDB for tracking resources and configurations.
+
+In summary, both Ansible and Puppet offer powerful tools for configuration management, yet they serve different strengths depending on an organization’s needs.
+
+Ansible’s YAML-based, agentless approach provides simplicity and flexibility, particularly for ad-hoc tasks and orchestration, though it can encounter performance limitations in large-scale environments and lacks native rollback features. Puppet, with its agent-based architecture and dedicated language, emphasizes consistency and compliance, supporting extensive configuration rollbacks and efficient scalability for large deployments. 
+
+Ultimately, the choice between Ansible and Puppet will depend on the balance between ease of use, control, and scalability requirements.
