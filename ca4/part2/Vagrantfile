@@ -1,0 +1,60 @@
+Vagrant.configure("2") do |config|
+
+    config.dns.tld = "mydomain"
+    config.vm.hostname = "mymachine"
+
+    # Copy public SSH key to VM
+    #config.vm.provision "file", source: "my_vagrant_key.pub", destination: "~/.ssh/authorized_keys"
+
+    # Paths to the private key
+    #config.ssh.private_key_path = ["my_vagrant_key", "~/.vagrant.d/insecure_private_key"]
+
+    # Disable Vagrant's default insecure key insertion
+    #config.ssh.insert_key = false
+
+    config.vm.provision "ansible" do |ansible|
+        ansible.playbook = "./common_playbook.yml"
+        ansible.compatibility_mode = "2.0"
+    end
+
+    config.vm.define "db" do |db|
+        db.vm.box = "bento/ubuntu-20.04"
+
+        config.vm.synced_folder "./h2data", "/home/vagrant/h2data"
+
+        #db.memory = "1024"
+        #db.cpus = 1
+
+        #config.disksize.size = '5 GB'
+
+        #db.vm.provision "shell", path: "install_h2.sh"
+        db.vm.provision "ansible" do |ansible|
+            ansible.playbook = "./db_playbook.yml"
+            ansible.compatibility_mode = "2.0"
+        end
+        db.vm.network "forwarded_port", guest: 9092, host: 1013
+        db.vm.network "forwarded_port", guest: 8082, host: 1014
+
+        db.vm.hostname = "database"
+        db.vm.network "private_network", type: "dhcp"
+    end
+
+    config.vm.define "app" do |app|
+        app.vm.box = "bento/ubuntu-20.04"
+
+        app.vm.network "forwarded_port", guest: 8080, host: 1010
+        app.vm.network "private_network", type: "dhcp"
+        app.vm.hostname = "app"
+
+        app.vm.provision "ansible" do |ansible|
+            ansible.playbook = "./requirements_app_playbook.yml"
+            ansible.compatibility_mode = "2.0"
+        end
+
+        app.vm.provision "ansible" do |ansible|
+            ansible.playbook = "./app_playbook.yml"
+            ansible.compatibility_mode = "2.0"
+        end
+
+    end
+end
