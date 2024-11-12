@@ -3,7 +3,7 @@ FROM openjdk:17-jdk-slim
 
 # Install Gradle
 RUN apt-get update && \
-    apt-get install -y wget unzip && \
+    apt-get install -y wget unzip git && \
     wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
     unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
     rm /tmp/gradle-7.6-bin.zip && \
@@ -13,11 +13,9 @@ RUN apt-get update && \
 ENV GRADLE_HOME /opt/gradle/gradle-7.6
 ENV PATH ${GRADLE_HOME}/bin:$PATH
 
-# Set the working directory inside the container
-WORKDIR /app
+RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
 
-# Copy the entire project into the container
-COPY . /app
+WORKDIR /app/ca2/part2
 
 # Run the Gradle build to generate the application JAR
 RUN gradle build --no-daemon
