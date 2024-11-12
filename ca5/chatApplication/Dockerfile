@@ -1,9 +1,9 @@
-# Use an official OpenJDK 17 image as the base image
+# Use the OpenJDK 17 slim image
 FROM openjdk:17-jdk-slim
 
-# Install Gradle
+# Install dependencies including wget, unzip, and git
 RUN apt-get update && \
-    apt-get install -y wget unzip && \
+    apt-get install -y wget unzip git && \
     wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
     unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
     rm /tmp/gradle-7.6-bin.zip && \
@@ -13,14 +13,15 @@ RUN apt-get update && \
 ENV GRADLE_HOME /opt/gradle/gradle-7.6
 ENV PATH ${GRADLE_HOME}/bin:$PATH
 
-# Set the working directory inside the container
-WORKDIR /app
+# Clone the repository
+RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
 
-# Copy the entire project into the container
-COPY . /app
+# Set the working directory to the project folder
+WORKDIR /app/ca2/part1/gradle_basic_demo-main
 
-# Run the Gradle build to generate the application JAR
+# Build the project with Gradle
 RUN gradle build
+
 # Expose the port the Spring Boot app runs on
 EXPOSE 59001
 
