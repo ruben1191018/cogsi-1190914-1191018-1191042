@@ -1,0 +1,93 @@
+plugins {
+    // Apply the application plugin to add support for building a Java application
+    id 'application'
+}
+
+// Configure Java toolchain
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17) 
+    }
+}
+
+application{
+    mainClass = 'basic_demo.App'
+}
+
+description = "A trivial Gradle build"
+version = "0.1.0"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Use Apache Log4J for logging
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.2'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.2'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
+    testImplementation 'org.mockito:mockito-core:3.7.7'
+}
+ 
+jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE // allow duplicates
+
+    manifest {
+        attributes "Main-Class": "basic_demo.App"
+    }
+
+   from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+
+
+task runClient(type:JavaExec, dependsOn: classes){
+    group = "DevOps"
+    description = "Launches a chat client that connects to a server on localhost:59001 "
+  
+    classpath = sourceSets.main.runtimeClasspath
+
+    mainClass = 'basic_demo.ChatClientApp'
+
+    args 'localhost', '59001'
+}
+
+
+task runServer(type:JavaExec, dependsOn: classes){
+    group = "DevOps"
+    description = "Launches a chat server that can be connected by clients on localhost:59001 "
+
+    classpath = sourceSets.main.runtimeClasspath
+
+    mainClass = 'basic_demo.ChatServerApp'
+    args '59001'
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+task backup(type: Copy) {
+    from 'src'
+
+    into "backup"
+}
+
+task zipBackup(type: Zip) {
+    dependsOn backup
+
+    from "backup"
+
+    destinationDirectory = file("archives")
+
+    archiveFileName = "backup.zip"
+}
