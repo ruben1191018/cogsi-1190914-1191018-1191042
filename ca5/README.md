@@ -36,18 +36,18 @@ This instruction copies the JAR file (app.jar) from the app/build/libs/ director
 
 After creating this Dockerfile, we built the image using:
 
-    docker build -f Dockerfile_version2 -t my-server-image .
+    docker build -f Dockerfile_version2 -t rest-app-image-version2 .
 
-In this command, we specified the docker file name and tag the image with the name my-server-image.
+In this command, we specified the docker file name and tag the image with the name rest-app-image-version2.
 
 ![alt text](image-1.png)
 
 To run the application:
 
-    docker run -p 8080:8080 my-server-image  
+    docker run -p 8080:8080 rest-app-image-version2  
 
 
-The docker run command starts a new container from the my-server-image Docker image.
+The docker run command starts a new container from the rest-app-image-version2 Docker image.
 The -p 8080:8080 flag ensures that any requests to localhost:8080 on the host are forwarded to port 8080 in the container where the Java application is listening.
 
 After this, we tested that the application was running:
@@ -79,7 +79,7 @@ This line specifies the base image for the container. We use openjdk:17-jdk-slim
     This sets the working directory inside the container to /app. All subsequent COPY, RUN, CMD, and other instructions will use this directory as their base path, making it easy to manage files and operations within the container.
 
 * COPY build/libs/basic_demo-0.1.0.jar /app/my-server.jar
-This instruction copies the JAR file (app.jar) from the build/libs/basic_demo-0.1.0.jar directory on the host machine into the /app directory in the container and renames it to my-server.jar. This is necessary to include the application code that will be executed when the container runs.
+This instruction copies the JAR file from the build/libs/basic_demo-0.1.0.jar directory on the host machine into the /app directory in the container and renames it to my-server.jar. This is necessary to include the application code that will be executed when the container runs.
 
 * ENTRYPOINT ["java", "-cp", "/app/my-server.jar", "basic_demo.ChatServerApp", "59001"]:
 This sets the command that is executed when the container starts. Here, java is run with the -cp (classpath) option, which specifies my-server.jar as the classpath. The main class basic_demo.ChatServerApp is the entry point for the application, and 59001 is an argument passed to it (the port the server listens on).
@@ -87,19 +87,57 @@ This sets the command that is executed when the container starts. Here, java is 
 
 After creating this Dockerfile, we built the image using:
 
-    docker build -f Dockerfile_version2 -t my-server-image .
+    docker build -f Dockerfile_version2 -t chat-app-image-version2 .
 
-In this command, we specified the docker file name and tag the image with the name my-server-image.
+In this command, we specified the docker file name and tag the image with the chat-app-image-version2.
 
 ![alt text](image-4.png)
 
 To run the application:
 
-    docker run -p 59001:59001 my-server-image  
+    docker run -p 59001:59001 chat-app-image-version2
 
 
-The docker run command starts a new container from the my-server-image Docker image.
+The docker run command starts a new container from the chat-app-image-version2 Docker image.
 The -p 59001:59001 flag ensures that any requests to localhost:8080 on the host are forwarded to port 8080 in the container where the Java application is listening.
 
 After this, we tested that the application was running:
 ![alt text](image-5.png)
+
+
+### Display the history of each image, showing each layer and command used to create the image Version 2
+
+To display the history of each image we ran:
+
+    docker history rest-app-image-version2
+
+![alt text](image-6.png)
+
+    docker history chat-app-image-version2
+
+![alt text](image-7.png)
+
+
+### Monitor container resource consumption in real-time Version 2
+
+In order to monitor both containers we ran the docker status command where we can see the following properties:
+
+* CPU %: Percentage of CPU usage.
+* MEM USAGE / LIMIT: Amount of memory used vs. total available memory for the container.
+* MEM %: Percentage of memory used relative to the available memory.
+* NET I/O: Network I/O stats (data sent/received).
+* BLOCK I/O: Block I/O stats (disk read/write).
+* PIDS: Number of processes running inside the container.
+
+So we ran 
+
+    docker stats REST_APP_V2
+
+![alt text](image-8.png)
+
+and 
+
+    docker stats CHAT_APP_V2
+
+![alt text](image-9.png)
+
