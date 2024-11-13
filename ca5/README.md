@@ -291,3 +291,43 @@ and
 
 ![alt text](image-9.png)
 
+### You should tag your images and publish them in Docker Hub version 2
+
+To deploy Docker images to Docker Hub, we followed a sequence of steps that involved logging in, tagging the images, and pushing them to the repository. Below is a detailed breakdown of each step and its purpose.
+
+#### Log in to Docker Hub
+First, we authenticated to Docker Hub by running the following command:
+
+    docker login
+
+This command prompts the user to enter their Docker Hub credentials (username and password) to establish a session with Docker Hub. Logging in is a necessary step to gain authorization for pushing images to our Docker Hub repositories.
+
+#### Tagging the Images
+
+Next, we assigned tags to each image. Tagging associates each local image with a specific repository and tag format that Docker Hub recognizes. We used the following commands:
+
+    docker tag rest-app-image-version2 1191018/cogsi-rest-v2:latest
+    docker tag chat-app-image-version2 1191018/cogsi-chat-v2:latest
+
+* docker tag: This command is used to label an existing local Docker image with a new name and tag.
+* rest-app-image-version2 and chat-app-image-version2: These are the original names of the local images we created or built.
+* 1191018/cogsi-rest-v2:latest and 1191018/cogsi-chat-v2:latest: These are the new names and tags assigned to each image. The format here is username/repository:tag.
+    * 1191018: Represents our Docker Hub username.
+    * cogsi-rest-v2 and cogsi-chat-v2: Specify the unique repository names for each image.
+    * latest: The chosen tag for this version of each image. The latest tag is commonly used to represent the most recent stable version.
+
+
+#### Pushing the Images to Docker Hub
+Finally, we pushed each tagged image to Docker Hub using the following commands:
+
+    docker push 1191018/cogsi-rest-v2:latest
+    docker push 1191018/cogsi-chat-v2:latest
+
+* docker push: This command uploads the tagged images from the local system to the specified Docker Hub repositories.
+
+* 1191018/cogsi-rest-v2:latest and 1191018/cogsi-chat-v2:latest: These refer to the fully qualified names of each image on Docker Hub, as specified during the tagging step.
+
+Once pushed, the images are available in our Docker Hub account under the specified repositories and can be pulled and used by others if permissions allow.
+
+This structured approach ensures that each image is correctly tagged and stored in a centralized Docker Hub repository, making it accessible for deployment and collaboration.
+
