@@ -1,5 +1,155 @@
 
 
+## Version 1 : Build the server within the Dockerfile itself (clone the repo and build the server inside the container)
+
+### Building Chat Version 1
+
+This Dockerfile sets up a Docker image to compile and run a Spring Boot Java application using Gradle as the build tool. Here’s a breakdown of each part:
+
+1. Choosing the Base Image
+
+
+        # Use the OpenJDK 17 slim image
+        FROM openjdk:17-jdk-slim
+
+The base image selected is openjdk:17-jdk-slim, a lightweight version of OpenJDK 17. This image is minimal and includes only essential components to run Java applications, keeping the final image size smaller.
+
+2. Installing Dependencies and Gradle
+
+
+    # Install dependencies including wget, unzip, and git
+    RUN apt-get update && \
+    apt-get install -y wget unzip git && \
+    wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
+    unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
+    rm /tmp/gradle-7.6-bin.zip && \
+    ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
+    In this section, essential dependencies for the project are installed:
+
+- apt-get update and apt-get install -y install wget, unzip, and git.
+- wget downloads Gradle 7.6 as a .zip file.
+- unzip extracts the Gradle archive to /opt/gradle.
+- ln -s creates a symbolic link to the Gradle executable at /usr/bin/gradle, making it accessible system-wide as gradle.
+
+3. Setting Environment Variables for Gradle
+
+
+    # Set environment variables for Gradle
+    ENV GRADLE_HOME /opt/gradle/gradle-7.6
+    ENV PATH ${GRADLE_HOME}/bin:$PATH
+    These environment variables set up the Gradle path, making it easy to access from anywhere within the environment. GRADLE_HOME points to the Gradle directory, while PATH is updated to include the Gradle binary.
+
+4. Cloning the Repository
+
+
+    # Clone the repository
+    RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+
+This line uses git to clone the project repository directly into the /app directory. This repository contains the source code that will be built and run.
+
+5. Setting the Working Directory
+
+
+    #Set the working directory to the project folder
+    WORKDIR /app/ca2/part1/gradle_basic_demo-main
+
+This sets the working directory of the container to /app/ca2/part1/gradle_basic_demo-main, where the project files are located.
+
+6. Building the Project with Gradle
+
+
+    # Build the project with Gradle
+    RUN gradle build
+
+This command compiles the project using Gradle, generating the required files (such as the application’s .jar file) within the build/libs directory.
+
+7. Exposing the Port
+
+
+    # Expose the port the Spring Boot app runs on
+    EXPOSE 59001
+
+This tells Docker that the application will use port 59001, enabling access to the service on this port when the container is running.
+
+8. Starting the Application
+
+    
+    # Run the application
+    ENTRYPOINT ["java", "-cp", "build/libs/basic_demo-0.1.0.jar", "basic_demo.ChatServerApp", "59001"]
+
+This defines the command to start the application. Specifically, it uses java to run the .jar file generated during the build process (basic_demo-0.1.0.jar) with the main class basic_demo.ChatServerApp and specifies port 59001 for the chat server.
+
+
+
+## Explore the concept of multi-stage builds to reduce the image size
+
+We can split the image into two stages: 
+
+- Build stage: This stage installs all necessary dependencies to build the application.
+
+        # Stage 1: Build stage
+        FROM openjdk:17-jdk-slim as build
+        
+        # Install build dependencies
+        RUN apt-get update && \
+        apt-get install -y wget unzip git && \
+        wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
+        unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
+        rm /tmp/gradle-7.6-bin.zip && \
+        ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
+        
+        # Set environment variables for Gradle
+        ENV GRADLE_HOME /opt/gradle/gradle-7.6
+        ENV PATH ${GRADLE_HOME}/bin:$PATH
+        
+        # Clone the repository
+        RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+        
+        # Set the working directory to the project folder
+        WORKDIR /app/ca2/part1/gradle_basic_demo-main
+        
+        # Build the project with Gradle
+        RUN gradle build
+
+- Runtime stage: This stage will use a lighter JRE image (without the build tools) to run the application. Only copies the JAR file and necessary runtime files, making it smaller.
+
+        # Stage 2: Runtime stage
+        FROM openjdk:17-jdk-slim
+        
+        # Copy the built JAR file from the build stage
+        COPY --from=build /app/ca2/part1/gradle_basic_demo-main/build/libs/basic_demo-0.1.0.jar /app/app.jar
+        
+        # Expose the port the Spring Boot app runs on
+        EXPOSE 59001
+        
+        # Run the application
+        ENTRYPOINT ["java", "-cp", "/app/app.jar", "basic_demo.ChatServerApp", "59001"]
+
+
+File Copying:
+
+- Instead of cloning and building in the final image, we copy only the necessary JAR file from the build stage.
+
+Reduced Image Size:
+
+- The final image now only contains the JRE and the application JAR, reducing the image size significantly.
+
+
+To build the image we used the following commands
+
+    docker build -t demo-image:latest
+    
+We tagged the image with the name demo-image:latest, and to run the image used the following command:
+
+    docker run -d --name demo-run -p 59001:59001 demo-image:latest
+
+The name specifies the name of the run, the -p publishes the port se we can access it from the outside and then we write the name of the image we want to run (created with the previous command)
+
+![img.png](img.png)
+
+As we can see, the application is running in the docker and receiving connections from the host machine.
+
+
 
 ## Version 2: Build the server on your host machine and copy the resulting JAR file into the Docker image
 
