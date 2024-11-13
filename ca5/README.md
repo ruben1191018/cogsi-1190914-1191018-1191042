@@ -331,3 +331,11 @@ Once pushed, the images are available in our Docker Hub account under the specif
 
 This structured approach ensures that each image is correctly tagged and stored in a centralized Docker Hub repository, making it accessible for deployment and collaboration.
 
+
+In the docker hub we have the following repositories for the different images: 
+
+![img_1.png](img_1.png)
+
+Inside each repository we can see the images pushed before:
+
+![img_2.png](img_2.png)
