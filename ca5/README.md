@@ -1,5 +1,3 @@
-
-
 ## Version 1 : Build the server within the Dockerfile itself (clone the repo and build the server inside the container)
 
 ### Building Chat Version 1
@@ -79,6 +77,72 @@ This tells Docker that the application will use port 59001, enabling access to t
 
 This defines the command to start the application. Specifically, it uses java to run the .jar file generated during the build process (basic_demo-0.1.0.jar) with the main class basic_demo.ChatServerApp and specifies port 59001 for the chat server.
 
+To build the image we used the following commands
+
+    docker build -t demo-image:latest
+
+We tagged the image with the name demo-image:latest, and to run the image used the following command:
+
+    docker run -d --name demo-run -p 59001:59001 demo-image:latest
+
+The name specifies the name of the run, the -p publishes the port se we can access it from the outside and then we write the name of the image we want to run (created with the previous command)
+
+![img.png](images/img.png)
+
+As we can see, the application is running in the docker and receiving connections from the host machine.
+
+
+### Building Rest Services Version 1
+
+First of all, I started by creating the Dockerfile inside the folder of the spring application.
+
+
+    # Use an official OpenJDK 17 image as the base image
+    FROM openjdk:17-jdk-slim
+    
+    # Install dependencies including wget, unzip, and git
+    RUN apt-get update && \
+    apt-get install -y wget unzip git && \
+    wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
+    unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
+    rm /tmp/gradle-7.6-bin.zip && \
+    ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
+    
+    # Set environment variables for Gradle
+    ENV GRADLE_HOME /opt/gradle/gradle-7.6
+    ENV PATH ${GRADLE_HOME}/bin:$PATH
+
+    # Clone the repository
+    RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+    
+    #Set the working directory to the project folder
+    WORKDIR /app/ca2/part2
+    
+    # Run the Gradle build to generate the application JAR
+    RUN gradle build
+    
+    # Expose the port the Spring Boot app runs on
+    EXPOSE 8080
+    
+    # Run the application
+    ENTRYPOINT ["java", "-jar", "app/build/libs/app.jar"]
+
+
+About the dockerfile, the logic is really similar to the chat application, that was already explained previously.
+
+To build the image we used the following commands:
+
+    docker build -t spring_application_image .
+
+We tagged the image with the name demo-image:latest, and to run the image used the following command:
+
+    docker run -d --name spring_application_run -p 8080:8080 spring_application_image
+
+The name specifies the name of the run, the -p publishes the port se we can access it from the outside and then we write the name of the image we want to run (created with the previous command)
+
+![img_3.png](images/img_3.png)
+
+As we can see, the application is running in the docker and receiving connections from the host machine.
 
 
 ## Explore the concept of multi-stage builds to reduce the image size
@@ -87,43 +151,88 @@ We can split the image into two stages:
 
 - Build stage: This stage installs all necessary dependencies to build the application.
 
-        # Stage 1: Build stage
-        FROM openjdk:17-jdk-slim as build
+    - Chat application
+
+          # Stage 1: Build stage
+          FROM openjdk:17-jdk-slim as build
         
-        # Install build dependencies
-        RUN apt-get update && \
-        apt-get install -y wget unzip git && \
-        wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
-        unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
-        rm /tmp/gradle-7.6-bin.zip && \
-        ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
+          # Install build dependencies
+          RUN apt-get update && \
+          apt-get install -y wget unzip git && \
+          wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
+          unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
+          rm /tmp/gradle-7.6-bin.zip && \
+          ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
         
-        # Set environment variables for Gradle
-        ENV GRADLE_HOME /opt/gradle/gradle-7.6
-        ENV PATH ${GRADLE_HOME}/bin:$PATH
+          # Set environment variables for Gradle
+          ENV GRADLE_HOME /opt/gradle/gradle-7.6
+          ENV PATH ${GRADLE_HOME}/bin:$PATH
         
-        # Clone the repository
-        RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+          # Clone the repository
+          RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
         
-        # Set the working directory to the project folder
-        WORKDIR /app/ca2/part1/gradle_basic_demo-main
+          # Set the working directory to the project folder
+          WORKDIR /app/ca2/part1/gradle_basic_demo-main
         
-        # Build the project with Gradle
-        RUN gradle build
+          # Build the project with Gradle
+          RUN gradle build
+
+    - Rest Services application
+      
+           # Stage 1: Build stage
+          FROM openjdk:17-jdk-slim
+        
+          # Install build dependencies
+          RUN apt-get update && \
+          apt-get install -y wget unzip git && \
+          wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
+          unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
+          rm /tmp/gradle-7.6-bin.zip && \
+          ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
+        
+          # Set environment variables for Gradle
+          ENV GRADLE_HOME /opt/gradle/gradle-7.6
+          ENV PATH ${GRADLE_HOME}/bin:$PATH
+        
+          # Clone the repository
+          RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+        
+          # Set the working directory to the project folder
+          WORKDIR /app/ca2/part2
+        
+          # Build the project with Gradle
+          RUN gradle build
+
 
 - Runtime stage: This stage will use a lighter JRE image (without the build tools) to run the application. Only copies the JAR file and necessary runtime files, making it smaller.
 
+  - Chat application
+
+          # Stage 2: Runtime stage
+          FROM openjdk:17-jdk-slim
+        
+          # Copy the built JAR file from the build stage
+          COPY --from=build /app/ca2/part1/gradle_basic_demo-main/build/libs/basic_demo-0.1.0.jar /app/app.jar
+        
+          # Expose the port the Spring Boot app runs on
+          EXPOSE 59001
+        
+          # Run the application
+          ENTRYPOINT ["java", "-cp", "/app/app.jar", "basic_demo.ChatServerApp", "59001"]
+
+  - Rest Services application
+
         # Stage 2: Runtime stage
         FROM openjdk:17-jdk-slim
-        
+    
         # Copy the built JAR file from the build stage
-        COPY --from=build /app/ca2/part1/gradle_basic_demo-main/build/libs/basic_demo-0.1.0.jar /app/app.jar
-        
+        COPY --from=build /app/ca2/part2/build/libs/app.jar      /app/app.jar
+    
         # Expose the port the Spring Boot app runs on
-        EXPOSE 59001
-        
+        EXPOSE 8080
+    
         # Run the application
-        ENTRYPOINT ["java", "-cp", "/app/app.jar", "basic_demo.ChatServerApp", "59001"]
+        ENTRYPOINT ["java", "-jar", "app/build/libs/app.jar"]
 
 
 File Copying:
@@ -135,21 +244,6 @@ Reduced Image Size:
 - The final image now only contains the JRE and the application JAR, reducing the image size significantly.
 
 
-To build the image we used the following commands
-
-    docker build -t demo-image:latest
-    
-We tagged the image with the name demo-image:latest, and to run the image used the following command:
-
-    docker run -d --name demo-run -p 59001:59001 demo-image:latest
-
-The name specifies the name of the run, the -p publishes the port se we can access it from the outside and then we write the name of the image we want to run (created with the previous command)
-
-![img.png](img.png)
-
-As we can see, the application is running in the docker and receiving connections from the host machine.
-
-
 
 ## Version 2: Build the server on your host machine and copy the resulting JAR file into the Docker image
 
@@ -158,7 +252,7 @@ As we can see, the application is running in the docker and receiving connection
 
 First, we ran the gradle build command to compile the project and create the JAR file.
 After that, we verified that the JAR was generated.
-![alt text](image.png)
+![alt text](images/image.png)
 
 Next, we created a custom Dockerfile, named "Dockerfile_version2", with the following configurations:
 
@@ -190,7 +284,7 @@ After creating this Dockerfile, we built the image using:
 
 In this command, we specified the docker file name and tag the image with the name rest-app-image-version2.
 
-![alt text](image-1.png)
+![alt text](images/image-1.png)
 
 To run the application:
 
@@ -201,13 +295,13 @@ The docker run command starts a new container from the rest-app-image-version2 D
 The -p 8080:8080 flag ensures that any requests to localhost:8080 on the host are forwarded to port 8080 in the container where the Java application is listening.
 
 After this, we tested that the application was running:
-![alt text](image-2.png)
+![alt text](images/image-2.png)
 
 ### Building Chat Version 2
 
 First, we ran the gradle build command to compile the project and create the JAR file.
 After that, we verified that the JAR was generated.
-![alt text](image-3.png)
+![alt text](images/image-3.png)
 
 Next, we created a custom Dockerfile, named "Dockerfile_version2", with the following configurations:
 
@@ -241,7 +335,7 @@ After creating this Dockerfile, we built the image using:
 
 In this command, we specified the docker file name and tag the image with the chat-app-image-version2.
 
-![alt text](image-4.png)
+![alt text](images/image-4.png)
 
 To run the application:
 
@@ -252,7 +346,7 @@ The docker run command starts a new container from the chat-app-image-version2 D
 The -p 59001:59001 flag ensures that any requests to localhost:8080 on the host are forwarded to port 8080 in the container where the Java application is listening.
 
 After this, we tested that the application was running:
-![alt text](image-5.png)
+![alt text](images/image-5.png)
 
 
 ### Display the history of each image, showing each layer and command used to create the image Version 2
@@ -261,11 +355,15 @@ To display the history of each image we ran:
 
     docker history rest-app-image-version2
 
-![alt text](image-6.png)
+![alt text](images/image-6.png)
 
     docker history chat-app-image-version2
 
-![alt text](image-7.png)
+![alt text](images/image-7.png)
+
+    docker history spring_application_image
+
+![img_4.png](images/img_4.png)
 
 
 ### Monitor container resource consumption in real-time Version 2
@@ -283,13 +381,21 @@ So we ran
 
     docker stats REST_APP_V2
 
-![alt text](image-8.png)
+![alt text](images/image-8.png)
 
 and 
 
     docker stats CHAT_APP_V2
 
-![alt text](image-9.png)
+![alt text](images/image-9.png)
+
+and
+
+    docker stats spring_application_run
+
+![img_5.png](images/img_5.png)
+
+    
 
 ### You should tag your images and publish them in Docker Hub version 2
 
@@ -308,12 +414,13 @@ Next, we assigned tags to each image. Tagging associates each local image with a
 
     docker tag rest-app-image-version2 1191018/cogsi-rest-v2:latest
     docker tag chat-app-image-version2 1191018/cogsi-chat-v2:latest
+    docker tag spring_application_image 1191018/cogsi-rest:latest
 
 * docker tag: This command is used to label an existing local Docker image with a new name and tag.
 * rest-app-image-version2 and chat-app-image-version2: These are the original names of the local images we created or built.
-* 1191018/cogsi-rest-v2:latest and 1191018/cogsi-chat-v2:latest: These are the new names and tags assigned to each image. The format here is username/repository:tag.
+* 1191018/cogsi-rest-v2:latest, 1191018/cogsi-chat-v2:latest and 1191018/cogsi-rest:latest: These are the new names and tags assigned to each image. The format here is username/repository:tag.
     * 1191018: Represents our Docker Hub username.
-    * cogsi-rest-v2 and cogsi-chat-v2: Specify the unique repository names for each image.
+    * cogsi-rest-v2,cogsi-chat-v2 and cogsi-rest: Specify the unique repository names for each image.
     * latest: The chosen tag for this version of each image. The latest tag is commonly used to represent the most recent stable version.
 
 
@@ -322,10 +429,11 @@ Finally, we pushed each tagged image to Docker Hub using the following commands:
 
     docker push 1191018/cogsi-rest-v2:latest
     docker push 1191018/cogsi-chat-v2:latest
+    docker push 1191018/cogsi-rest:latest
 
 * docker push: This command uploads the tagged images from the local system to the specified Docker Hub repositories.
 
-* 1191018/cogsi-rest-v2:latest and 1191018/cogsi-chat-v2:latest: These refer to the fully qualified names of each image on Docker Hub, as specified during the tagging step.
+* 1191018/cogsi-rest-v2:latest, 1191018/cogsi-chat-v2:latest and 1191018/cogsi-rest:latest: These refer to the fully qualified names of each image on Docker Hub, as specified during the tagging step.
 
 Once pushed, the images are available in our Docker Hub account under the specified repositories and can be pulled and used by others if permissions allow.
 
@@ -334,8 +442,8 @@ This structured approach ensures that each image is correctly tagged and stored 
 
 In the docker hub we have the following repositories for the different images: 
 
-![img_1.png](img_1.png)
+![img_1.png](images/img_1.png)
 
 Inside each repository we can see the images pushed before:
 
-![img_2.png](img_2.png)
+![img_2.png](images/img_2.png)
