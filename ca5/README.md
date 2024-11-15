@@ -555,15 +555,16 @@ Stops and removes containers, networks, and volumes.
 
 - Ping Test
 
-  Verify container connectivity using:
+  To do this test, we need to verify container connectivity using:
 
   
     docker exec -it cogsi_app ping h2
 
+  Proof
 
 - Database Connection Test
 
-  Review the Spring application logs to confirm successful database connection.
+  Proofs that the connection was alright
 
 
 ### Environment Variable Summary
