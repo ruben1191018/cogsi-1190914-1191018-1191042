@@ -1,3 +1,5 @@
+# Part 1
+
 ## Version 1 : Build the server within the Dockerfile itself (clone the repo and build the server inside the container)
 
 ### Building Chat Version 1
@@ -447,3 +449,143 @@ In the docker hub we have the following repositories for the different images:
 Inside each repository we can see the images pushed before:
 
 ![img_2.png](images/img_2.png)
+
+
+# Part 2
+
+On this section, we will provide a comprehensive guide to the Docker Compose configuration for
+deploying the Building REST Services with Spring application alongside an H2 database. 
+The setup includes a custom network, persistent storage, and environment variable-based 
+configuration to ensure seamless integration and scalability.
+
+The Docker Compose setup orchestrates two services:
+
+- Spring Application (app)
+  - Hosts the Gradle-based RESTful service.
+
+- H2 Database (h2-db)
+  - Runs the H2 database in server mode with persistent storage.
+
+## Docker compose configuration:
+
+![img.png](images/dockerCompose.png)
+
+
+### Services
+
+- app(Spring application)
+
+  - Image: 1191018/cogsi-rest-v2:latest:
+
+    A pre-built image of the Spring application, pushed to a Docker registry.
+  
+  - Container Name: cogsi_app
+  
+    Simplifies identification.
+
+  - Ports:
+  
+    Maps 8080:8080 for application access via http://localhost:8080.
+    
+  - Environment Variables:
+    
+
+    SPRING_DATASOURCE_URL: Connects to the H2 database at jdbc:h2:tcp://h2:1521/~/test.
+    SPRING_DATASOURCE_USERNAME: Default is sa.
+    SPRING_DATASOURCE_PASSWORD: Default is empty.
+    SPRING_DATASOURCE_DRIVERCLASSNAME: org.h2.Driver.
+    SPRING_JPA_HIBERNATE_DDL_AUTO: Ensures schema creation during startup.
+    
+  - Dependencies:
+
+    depends_on: Ensures h2-db starts before app.
+    
+  - Network:
+
+    Connected to a custom bridge network (app-network).
+
+
+- h2-db (H2 Database)
+
+  - Image: 1000kit/h2
+  
+    Runs H2 in server mode.
+    
+  - Container Name: h2
+    
+  - Ports:
+    - Maps 8181:8181 for the H2 web console (http://localhost:8181).
+    - Maps 1521:1521 for database communication.
+    
+  - Volumes:
+    
+    h2-data:/opt/h2-data: Ensures persistent storage for database files.
+    
+  - Network:
+  
+    Connected to app-network.
+
+### Volumes
+
+- app-network:
+
+    A custom bridge network enabling service communication via container names (e.g., h2).
+
+### How to Use
+
+#### Start the Services
+
+    docker-compose up -d
+
+Starts both services in detached mode.
+
+#### Access the Services
+
+Spring Application: http://localhost:8080
+H2 Database Console: http://localhost:8181
+
+#### Stop the Services
+
+    docker-compose down
+
+Stops and removes containers, networks, and volumes.
+
+
+### Testing Network Connectivity
+
+- Ping Test
+
+  Verify container connectivity using:
+
+  
+    docker exec -it cogsi_app ping h2
+
+
+- Database Connection Test
+
+  Review the Spring application logs to confirm successful database connection.
+
+
+### Environment Variable Summary
+
+| Variable                          | Description                               |
+|-----------------------------------|-------------------------------------------|
+| SPRING_DATASOURCE_URL             | 	JDBC URL for connecting to the database. |
+| SPRING_DATASOURCE_USERNAME        | Database username (default: sa).          |
+| SPRING_DATASOURCE_PASSWORD        | Database password (default: empty).       |
+| SPRING_DATASOURCE_DRIVERCLASSNAME | 	Database driver (org.h2.Driver).         |
+| SPRING_JPA_HIBERNATE_DDL_AUTO     | Hibernate schema creation mode.           |
+
+
+### Persistence 
+
+- Volume:
+
+    Data is stored in h2-data, ensuring durability across container restarts or deletions.
+
+
+## Conclusion
+
+This Docker Compose setup simplifies the deployment of the Building REST Services with Spring 
+application and the H2 database. With persistent storage, seamless networking, and straightforward
+configuration, this setup provides a robust solution for development and testing environments.
