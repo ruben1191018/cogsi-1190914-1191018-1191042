@@ -468,7 +468,7 @@ The Docker Compose setup orchestrates two services:
 
 ## Docker compose configuration:
 
-![img.png](images/dockerCompose.png)
+![img_1.png](img_1.png)
 
 
 ### Services
@@ -585,7 +585,12 @@ Stops and removes containers, networks, and volumes.
     Data is stored in h2-data, ensuring durability across container restarts or deletions.
 
 
-## Conclusion
+### Block connections outside the containers
+To block all the connections outside the specified containers we defined the property "internal"  to true.
+By default, Compose provides external connectivity to networks. internal, when set to true, allows to create an externally isolated network.
+
+
+### Conclusion
 
 This Docker Compose setup simplifies the deployment of the Building REST Services with Spring 
 application and the H2 database. With persistent storage, seamless networking, and straightforward
@@ -622,7 +627,7 @@ Podman (short for "Pod Manager") is a popular alternative to Docker for containe
 ### Systemd Integration
 
 * Podman: Integrates seamlessly with systemd for managing container lifecycles, making it easier to define and control services. Containers can be launched and monitored directly as system services.
-
+ 
 * Docker: Requires additional configuration to work with systemd for container lifecycle management, which can be less straightforward.
 
 ### Performance and Resource Utilization
@@ -633,3 +638,57 @@ Podman (short for "Pod Manager") is a popular alternative to Docker for containe
 
 Conclusion
 Podman presents a robust, secure, and flexible alternative to Docker for container management. It excels in areas such as rootless operations, security, and direct integration with systemd, making it a strong candidate for developers and organizations prioritizing security and Kubernetes-native workflows. While Docker remains a highly adopted and user-friendly solution with a mature ecosystem, Podman's feature set and design choices provide distinct advantages that cater to modern container management needs.
+
+## Alternative Implementation
+
+
+### Part 2
+
+Podman Compose
+
+Podman is compatible with Docker Compose YAML files, but we may need to make some adjustments and use the podman-compose tool to deploy the same stack. The equivalent podman-compose YAML for the Docker Compose configuration is the exact same:
+
+        version: '3.8'
+
+        services:
+            app:
+                image: 1191018/cogsi-rest-v2:latest
+                container_name: cogsi_app
+                ports:
+                - "8080:8080"
+                environment:
+                  - SPRING_DATASOURCE_URL=jdbc:h2:tcp://h2:1521/./test
+                  - SPRING_DATASOURCE_USERNAME=sa
+                  - SPRING_DATASOURCE_PASSWORD=
+                  - SPRING_DATASOURCE_DRIVERCLASSNAME=org.h2.Driver
+                  - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+                depends_on:
+                    - h2-db
+                networks:
+                    - app-network
+        
+        h2-db:
+            container_name: 'h2'
+            image: 1000kit/h2
+            ports:
+                - "8181:8181"
+                - "1521:1521"
+            volumes:
+              - h2-data:/opt/h2-data
+            networks:
+              - app-network
+        
+        volumes:
+            h2-data:
+        
+        networks:
+            app-network:
+                driver: bridge
+                internal: true
+
+To compose the containers we can use the following command:
+
+        podman-compose up
+
+
+
