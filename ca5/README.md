@@ -468,7 +468,7 @@ The Docker Compose setup orchestrates two services:
 
 ## Docker compose configuration:
 
-![img_1.png](img_1.png)
+![img_1.png](images/img_8.png)
 
 
 ### Services
@@ -520,10 +520,14 @@ The Docker Compose setup orchestrates two services:
   - Volumes:
     
     h2-data:/opt/h2-data: Ensures persistent storage for database files.
+     
+    ![img_3.png](images/img_10.png)
+    ![img_2.png](images/img_9.png)
     
   - Network:
   
     Connected to app-network.
+
 
 ### Volumes
 
@@ -538,6 +542,8 @@ The Docker Compose setup orchestrates two services:
     docker-compose up -d
 
 Starts both services in detached mode.
+
+![img_4.png](images/img_11.png)
 
 #### Access the Services
 
@@ -558,13 +564,31 @@ Stops and removes containers, networks, and volumes.
   To do this test, we need to verify container connectivity using:
 
   
-    docker exec -it cogsi_app ping h2
+    docker run -it --network ca5_app-network busybox ping h2
 
-  Proof
+  - This command creates and starts a new container based on busybox.
+  - -it: This is a combination of two flags:
+    - -i (Interactive): Keeps the container’s standard input (stdin) open, allowing the user to provide input to the container interactively.
+    - -t (TTY): Allocates a pseudo-TTY (terminal) for the container, making it act like a typical command-line terminal.
+  - --network ca5_app-network
+    - --network: Specifies the network that the container should connect to.
+    - ca5_app-network: The name of the Docker network to which the container is attached. This ensures the container can communicate with other containers connected to the same network.
+  - busybox
+    - This is the name of the Docker image used to create the container.
+    - busybox is a minimal Linux distribution designed for small or lightweight tasks, including networking utilities like ping.
+  - ping h2
+    - It runs the ping command to check if the h2 service (the database container) is reachable within the network.
 
-- Database Connection Test
+  ![img_5.png](images/img_12.png)
 
-  Proofs that the connection was alright
+- Database Connection
+
+  ![img_6.png](images/img_13.png)
+
+As you can see in the image above, the application is connected to the DB and you can see in this line:
+
+    2024-11-18T22:10:51.539Z  INFO 1 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:tcp://h2:1521/./test user=SA
+
 
 
 ### Environment Variable Summary
@@ -636,7 +660,8 @@ Podman (short for "Pod Manager") is a popular alternative to Docker for containe
 
 * Docker: The Docker daemon can introduce overhead, especially in environments where lightweight and efficient resource use is essential.
 
-Conclusion
+### Conclusion
+
 Podman presents a robust, secure, and flexible alternative to Docker for container management. It excels in areas such as rootless operations, security, and direct integration with systemd, making it a strong candidate for developers and organizations prioritizing security and Kubernetes-native workflows. While Docker remains a highly adopted and user-friendly solution with a mature ecosystem, Podman's feature set and design choices provide distinct advantages that cater to modern container management needs.
 
 ## Alternative Implementation
