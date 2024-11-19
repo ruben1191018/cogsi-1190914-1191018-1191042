@@ -1,0 +1,7 @@
+FROM docker.io/library/openjdk:17-jdk-slim
+
+WORKDIR /app
+
+COPY app/build/libs/app.jar /app/my-server.jar
+
+ENTRYPOINT ["java", "-jar", "/app/my-server.jar"]
