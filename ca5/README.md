@@ -666,10 +666,218 @@ Podman presents a robust, secure, and flexible alternative to Docker for contain
 
 ## Alternative Implementation
 
+### Part 1
+
+#### PodmanFile Chat Application:
+
+    FROM docker.io/library/openjdk:17-jdk-slim
+
+    # Install Gradle
+    RUN apt-get update && \
+    apt-get install -y wget unzip git && \
+    wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
+    unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
+    rm /tmp/gradle-7.6-bin.zip && \
+    ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
+    
+    # Set environment variables for Gradle
+    ENV GRADLE_HOME /opt/gradle/gradle-7.6
+    ENV PATH ${GRADLE_HOME}/bin:$PATH
+    
+    # Clone the repository
+    RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+    
+    # Set working directory and build the application
+    WORKDIR /app/ca2/part1/gradle_basic_demo-main
+    RUN gradle build
+    
+    # Expose the application port
+    EXPOSE 59001
+    
+    # Run the application
+    ENTRYPOINT ["java", "-cp", "build/libs/basic_demo-0.1.0.jar", "basic_demo.ChatServerApp", "59001"]
+
+These are the commands that we used to build and run the application with Podman:
+
+    podman build -t chat-app-image .
+    podman run -d -p 59001:59001 --name chat-app-run chat-app-image
+
+
+#### PodmanFile Chat Application version 2:
+
+    FROM docker.io/library/openjdk:17-jdk-slim
+    
+    # Set working directory
+    WORKDIR /app
+    
+    # Copy the pre-built JAR file
+    COPY build/libs/basic_demo-0.1.0.jar /app/my-server.jar
+    
+    # Expose the application port
+    EXPOSE 59001
+    
+    # Run the application
+    ENTRYPOINT ["java", "-cp", "/app/my-server.jar", "basic_demo.ChatServerApp", "59001"]
+
+To ensure that the application is built locally first, we ran this command
+
+    gradle build
+
+To build and run the podman container
+
+    podman build -t chat-app-version2 .
+    podman run -d -p 59001:59001 --name chat-app-version2-run chat-app-version2
+
+
+#### Podmanfile for MultiStage build
+
+This variant optimizes the build process by separating the build and runtime stages.
+
+    # Stage 1: Build stage
+    FROM docker.io/library/openjdk:17-jdk-slim as build
+    
+    # Install build dependencies
+    RUN apt-get update && \
+    apt-get install -y wget unzip git && \
+    wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
+    unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
+    rm /tmp/gradle-7.6-bin.zip && \
+    ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
+    
+    # Set environment variables for Gradle
+    ENV GRADLE_HOME /opt/gradle/gradle-7.6
+    ENV PATH ${GRADLE_HOME}/bin:$PATH
+    
+    # Clone the repository
+    RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+    
+    # Set working directory and build the application
+    WORKDIR /app/ca2/part1/gradle_basic_demo-main
+    RUN gradle build
+    
+    # Stage 2: Runtime stage
+    FROM docker.io/library/openjdk:17-jdk-slim
+    
+    # Copy the built application from the build stage
+    COPY --from=build /app/ca2/part1/gradle_basic_demo-main/build/libs/basic_demo-0.1.0.jar /app/app.jar
+    
+    # Expose the application port
+    EXPOSE 59001
+    
+    # Run the application
+    ENTRYPOINT ["java", "-cp", "/app/app.jar", "basic_demo.ChatServerApp", "59001"]
+
+Commands to build and run:
+
+    podman build -t chat-app-multistage .
+    podman run -d -p 59001:59001 --name chat-app-multistage-run chat-app-multistage
+
+#### Podmanfile for Rest application
+
+    FROM docker.io/library/openjdk:17-jdk-slim
+
+    # Install Gradle
+    RUN apt-get update && \
+    apt-get install -y wget unzip git && \
+    wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
+    unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
+    rm /tmp/gradle-7.6-bin.zip && \
+    ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
+    
+    # Set environment variables for Gradle
+    ENV GRADLE_HOME /opt/gradle/gradle-7.6
+    ENV PATH ${GRADLE_HOME}/bin:$PATH
+    
+    # Clone the repository
+    RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+    
+    # Set working directory and build the application
+    WORKDIR /app/ca2/part2
+    RUN gradle build --no-daemon
+    
+    # Expose the application port
+    EXPOSE 8080
+    
+    # Run the application
+    ENTRYPOINT ["java", "-jar", "app/build/libs/app.jar"]
+
+
+These are the commands that you need to build and run the application with Podman:
+
+    podman build -t spring_application_image .
+    podman run -d -p 8080:8080 --name spring_application_run spring_application_image
+
+#### Podmanfile for Rest application version 2
+
+    FROM docker.io/library/openjdk:17-jdk-slim
+
+    # Set working directory
+    WORKDIR /app
+    
+    # Copy the pre-built JAR file into the container
+    COPY app/build/libs/app.jar /app/my-server.jar
+    
+    # Run the application
+    ENTRYPOINT ["java", "-jar", "/app/my-server.jar"] 
+
+Commands to build and run:
+
+    podman build -f spring_application_image_version2
+    podman run -p 8080:8080 spring_application_run_version2 spring_application_image_version2
+
+### Monitor Container Resource Consumption in Real-Time
+
+To monitor the real-time resource consumption of containers in Podman, we used the podman stats command.
+
+The following command is used to monitor the resource usage of a container:
+
+    podman stats spring_application_run
+
+### Display the History of Each Image
+
+To display the history of an image in Podman, we used these commands:
+
+    podman history chat-app-image
+    podman history chat-app-version2
+    podman history chat-app-multistage
+    podman history spring_application_image
+    podman history spring_application_image_version2
+
+
+### Tag and Push the images to DockerHub
+
+First, we authenticated to Docker Hub by running the following command:
+
+    podman login docker.io
+
+This command prompts the user to enter their Docker Hub credentials (username and password) to establish a session with Docker Hub. Logging in is a necessary step to gain authorization for pushing images to our Docker Hub repositories.
+
+
+To share the Podman images with others, we tagged them with Docker Hub
+repository name and then push them to Docker Hub. Here's a 
+breakdown of the process:
+
+The podman tag command is used to assign a Docker Hub-compatible repository 
+name and tag to your local image.
+
+    podman tag chat-app-image 1191018/cogsi-chat:latest
+    podman tag chat-app-version2 1191018/cogsi-chat-v2:latest
+    podman tag chat-app-multistage 1191018/chat-app-multistage:latest
+    podman tag spring_application_image 1191018/cogsi-rest:latest
+    podman tag spring_application_image-version2 1191018/cogsi-rest-v2:latest
+
+The podman push command uploads the tagged images to Docker Hub, making them accessible to others.
+
+    podman push 1191018/cogsi-rest:latest
+    podman push 1191018/cogsi-rest-v2:latest
+    podman push 1191018/chat-app-multistage:latest
+    podman push 1191018/cogsi-chat:latest
+    podman push 1191018/cogsi-chat-v2:latest
+
 
 ### Part 2
 
-Podman Compose
+#### Podman Compose
 
 Podman is compatible with Docker Compose YAML files, but we may need to make some adjustments and use the podman-compose tool to deploy the same stack. The equivalent podman-compose YAML for the Docker Compose configuration is the exact same:
 
@@ -714,6 +922,3 @@ Podman is compatible with Docker Compose YAML files, but we may need to make som
 To compose the containers we can use the following command:
 
         podman-compose up
-
-
-
