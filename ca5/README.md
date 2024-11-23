@@ -101,7 +101,7 @@ As we can see, the application is running in the docker and receiving connection
 
 ### Building Rest Services Version 1
 
-First of all, I started by creating the Dockerfile inside the folder of the spring application.
+First of all, we started by creating the Dockerfile inside the folder of the spring application.
 
 
     # Use an official OpenJDK 17 image as the base image
@@ -141,7 +141,7 @@ To build the image we used the following commands:
 
     docker build -t spring_application_image .
 
-We tagged the image with the name demo-image:latest, and to run the image used the following command:
+We tagged the image with the name spring_application_image, and to run the image used the following command:
 
     docker run -d --name spring_application_run -p 8080:8080 spring_application_image
 
