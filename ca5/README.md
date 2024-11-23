@@ -17,14 +17,15 @@ The base image selected is openjdk:17-jdk-slim, a lightweight version of OpenJDK
 2. Installing Dependencies and Gradle
 
 
-    # Install dependencies including wget, unzip, and git
-    RUN apt-get update && \
-    apt-get install -y wget unzip git && \
-    wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
-    unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
-    rm /tmp/gradle-7.6-bin.zip && \
-    ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
-    In this section, essential dependencies for the project are installed:
+        # Install dependencies including wget, unzip, and git
+        RUN apt-get update && \
+        apt-get install -y wget unzip git && \
+        wget https://services.gradle.org/distributions/gradle-7.6-bin.zip -P /tmp && \
+        unzip -d /opt/gradle /tmp/gradle-7.6-bin.zip && \
+        rm /tmp/gradle-7.6-bin.zip && \
+        ln -s /opt/gradle/gradle-7.6/bin/gradle /usr/bin/gradle
+        In this section, essential dependencies for the project are installed:
+
 
 - apt-get update and apt-get install -y install wget, unzip, and git.
 - wget downloads Gradle 7.6 as a .zip file.
@@ -34,48 +35,52 @@ The base image selected is openjdk:17-jdk-slim, a lightweight version of OpenJDK
 3. Setting Environment Variables for Gradle
 
 
-    # Set environment variables for Gradle
-    ENV GRADLE_HOME /opt/gradle/gradle-7.6
-    ENV PATH ${GRADLE_HOME}/bin:$PATH
-    These environment variables set up the Gradle path, making it easy to access from anywhere within the environment. GRADLE_HOME points to the Gradle directory, while PATH is updated to include the Gradle binary.
+        # Set environment variables for Gradle
+        ENV GRADLE_HOME /opt/gradle/gradle-7.6
+        ENV PATH ${GRADLE_HOME}/bin:$PATH
+
+
+
+These environment variables set up the Gradle path, making it easy to access from anywhere within the environment. GRADLE_HOME points to the Gradle directory, while PATH is updated to include the Gradle binary.
 
 4. Cloning the Repository
 
 
-    # Clone the repository
-    RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+        # Clone the repository
+        RUN git clone https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git /app
+
 
 This line uses git to clone the project repository directly into the /app directory. This repository contains the source code that will be built and run.
 
 5. Setting the Working Directory
 
 
-    #Set the working directory to the project folder
-    WORKDIR /app/ca2/part1/gradle_basic_demo-main
+        #Set the working directory to the project folder
+        WORKDIR /app/ca2/part1/gradle_basic_demo-main
 
 This sets the working directory of the container to /app/ca2/part1/gradle_basic_demo-main, where the project files are located.
 
 6. Building the Project with Gradle
 
 
-    # Build the project with Gradle
-    RUN gradle build
+        # Build the project with Gradle
+        RUN gradle build
 
 This command compiles the project using Gradle, generating the required files (such as the application’s .jar file) within the build/libs directory.
 
 7. Exposing the Port
 
 
-    # Expose the port the Spring Boot app runs on
-    EXPOSE 59001
+        # Expose the port the Spring Boot app runs on
+        EXPOSE 59001
 
 This tells Docker that the application will use port 59001, enabling access to the service on this port when the container is running.
 
 8. Starting the Application
 
     
-    # Run the application
-    ENTRYPOINT ["java", "-cp", "build/libs/basic_demo-0.1.0.jar", "basic_demo.ChatServerApp", "59001"]
+        # Run the application
+        ENTRYPOINT ["java", "-cp", "build/libs/basic_demo-0.1.0.jar", "basic_demo.ChatServerApp", "59001"]
 
 This defines the command to start the application. Specifically, it uses java to run the .jar file generated during the build process (basic_demo-0.1.0.jar) with the main class basic_demo.ChatServerApp and specifies port 59001 for the chat server.
 
@@ -488,13 +493,15 @@ The Docker Compose setup orchestrates two services:
     Maps 8080:8080 for application access via http://localhost:8080.
     
   - Environment Variables:
-    
 
-    SPRING_DATASOURCE_URL: Connects to the H2 database at jdbc:h2:tcp://h2:1521/~/test.
-    SPRING_DATASOURCE_USERNAME: Default is sa.
-    SPRING_DATASOURCE_PASSWORD: Default is empty.
-    SPRING_DATASOURCE_DRIVERCLASSNAME: org.h2.Driver.
-    SPRING_JPA_HIBERNATE_DDL_AUTO: Ensures schema creation during startup.
+| Variable                          | Description                               |
+|-----------------------------------|-------------------------------------------|
+| SPRING_DATASOURCE_URL             | 	JDBC URL for connecting to the database. |
+| SPRING_DATASOURCE_USERNAME        | Database username (default: sa).          |
+| SPRING_DATASOURCE_PASSWORD        | Database password (default: empty).       |
+| SPRING_DATASOURCE_DRIVERCLASSNAME | 	Database driver (org.h2.Driver).         |
+| SPRING_JPA_HIBERNATE_DDL_AUTO     | Hibernate schema creation mode.           |
+
     
   - Dependencies:
 
@@ -588,18 +595,6 @@ Stops and removes containers, networks, and volumes.
 As you can see in the image above, the application is connected to the DB and you can see in this line:
 
     2024-11-18T22:10:51.539Z  INFO 1 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:tcp://h2:1521/./test user=SA
-
-
-
-### Environment Variable Summary
-
-| Variable                          | Description                               |
-|-----------------------------------|-------------------------------------------|
-| SPRING_DATASOURCE_URL             | 	JDBC URL for connecting to the database. |
-| SPRING_DATASOURCE_USERNAME        | Database username (default: sa).          |
-| SPRING_DATASOURCE_PASSWORD        | Database password (default: empty).       |
-| SPRING_DATASOURCE_DRIVERCLASSNAME | 	Database driver (org.h2.Driver).         |
-| SPRING_JPA_HIBERNATE_DDL_AUTO     | Hibernate schema creation mode.           |
 
 
 ### Persistence 
@@ -802,7 +797,7 @@ Commands to build and run:
     ENTRYPOINT ["java", "-jar", "app/build/libs/app.jar"]
 
 
-These are the commands that you need to build and run the application with Podman:
+These weree the commands that we used to build and run the application with Podman:
 
     podman build -t spring_application_image .
     podman run -d -p 8080:8080 --name spring_application_run spring_application_image
