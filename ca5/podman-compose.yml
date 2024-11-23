@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    image: 1191018/cogsi-rest-v2:latest
+    container_name: cogsi_app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:tcp://h2:1521/./test
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_DATASOURCE_DRIVERCLASSNAME=org.h2.Driver
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+    depends_on:
+      - h2-db
+    networks:
+      - app-network
+
+  h2-db:
+    container_name: 'h2'
+    image: 1000kit/h2
+    ports:
+      - "8181:8181"
+      - "1521:1521"
+    volumes:
+      - h2-data:/opt/h2-data
+    networks:
+      - app-network
+volumes:
+  h2-data:
+
+networks:
+  app-network:
+    driver: bridge
+    internal: true
