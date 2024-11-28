@@ -57,18 +57,24 @@ pipeline {
                     echo "Tagging the build as ${version}"
 
                     dir('ca6/springApplication') {
-                        withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        // Use withCredentials to securely pass SSH private key
+                        withCredentials([sshUserPrivateKey(credentialsId: 'github-creds-ssh', keyFileVariable: 'SSH_KEY')]) {
+                            // Add the SSH key to the ssh-agent for the current session
                             sh """
+                                eval \$(ssh-agent -s)
+                                ssh-add ${SSH_KEY}
+
                                 git config user.name "Jenkins CI"
                                 git config user.email "jenkins@example.com"
                                 git tag -a ${version} -m "Stable build ${version}"
-                                git push https://${USERNAME}:${PASSWORD}@github.com/ruben1191018/cogsi-1190914-1191018-1191042.git ${version}
+                                git push git@github.com:ruben1191018/cogsi-1190914-1191018-1191042.git ${version}
                             """
                         }
                     }
                 }
             }
         }
+
 
         stage('Deploy to Production?') {
             steps {
