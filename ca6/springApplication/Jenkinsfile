@@ -11,7 +11,10 @@ pipeline {
 
         stage('Assemble') {
             steps {
-                dir('springApplication') { // Navigate into the springApplication folder
+                dir('ca6/springApplication') {
+                    echo 'Making gradlew executable'
+                    sh 'chmod +x gradlew' // Add this line to make gradlew executable
+
                     echo 'Compiling the code and building artifact files'
                     sh './gradlew clean build -x test'
                 }
@@ -20,7 +23,10 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir('springApplication') { // Navigate into the springApplication folder
+                dir('ca6/springApplication') {
+                    echo 'Making gradlew executable'
+                    sh 'chmod +x gradlew' // Ensure this step is repeated in case of separate environments
+
                     echo 'Running unit tests to verify the application’s correctness'
                     sh './gradlew test'
 
@@ -32,9 +38,9 @@ pipeline {
 
         stage('Archive') {
             steps {
-                dir('springApplication') { // Navigate into the springApplication folder
+                dir('ca6/springApplication') {
                     echo 'Archiving the built artifacts'
-                    archiveArtifacts artifacts: 'build/libs/*.jar', allowEmptyArchive: false
+                    archiveArtifacts artifacts: 'app/build/libs/*.jar', allowEmptyArchive: false
                 }
             }
         }
@@ -52,7 +58,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                dir('springApplication') { // If deployment files are in springApplication
+                dir('ca6/springApplication') {
                     echo 'Deploying the application using Ansible playbook'
                     sh 'ansible-playbook -i inventory/hosts deploy.yml --extra-vars "target=green_vm"'
                 }
