@@ -58,12 +58,12 @@ pipeline {
 
                             dir('ca6/springApplication') {
                                 // Add a Git tag with the stable naming convention
-                                sh '''
+                                sh """
                                     git config user.name "Jenkins CI"
                                     git config user.email "jenkins@example.com"
                                     git tag -a ${version} -m "Stable build ${version}"
                                     git push origin ${version}
-                                '''
+                                """
                             }
                         }
                     }
