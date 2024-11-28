@@ -64,6 +64,7 @@ pipeline {
                                 eval \$(ssh-agent -s)
                                 ssh-add ${SSH_KEY}
 
+
                                 git config user.name "Jenkins CI"
                                 git config user.email "jenkins@example.com"
                                 git tag -a ${version} -m "Stable build ${version}"
