@@ -11,22 +11,31 @@ pipeline {
 
         stage('Assemble') {
             steps {
-                echo 'Compiling the code and building artifact files'
-                sh './gradlew clean build -x test'
+                dir('springApplication') { // Navigate into the springApplication folder
+                    echo 'Compiling the code and building artifact files'
+                    sh './gradlew clean build -x test'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running unit tests to verify the application’s correctness'
-                sh './gradlew test'
+                dir('springApplication') { // Navigate into the springApplication folder
+                    echo 'Running unit tests to verify the application’s correctness'
+                    sh './gradlew test'
+
+                    echo 'Publishing test results in Jenkins'
+                    junit '**/build/test-results/test/*.xml'
+                }
             }
         }
 
         stage('Archive') {
             steps {
-                echo 'Archiving the built artifacts'
-                archiveArtifacts artifacts: 'build/libs/*.jar', allowEmptyArchive: false
+                dir('springApplication') { // Navigate into the springApplication folder
+                    echo 'Archiving the built artifacts'
+                    archiveArtifacts artifacts: 'build/libs/*.jar', allowEmptyArchive: false
+                }
             }
         }
 
@@ -43,8 +52,10 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deploying the application using Ansible playbook'
-                sh 'ansible-playbook -i inventory/hosts deploy.yml --extra-vars "target=green_vm"'
+                dir('springApplication') { // If deployment files are in springApplication
+                    echo 'Deploying the application using Ansible playbook'
+                    sh 'ansible-playbook -i inventory/hosts deploy.yml --extra-vars "target=green_vm"'
+                }
             }
         }
     }
