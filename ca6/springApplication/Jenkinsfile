@@ -45,6 +45,30 @@ pipeline {
             }
         }
 
+        stage('Tag Stable Build') {
+                    when {
+                        expression {
+                            currentBuild.result == null || currentBuild.result == 'SUCCESS'
+                        }
+                    }
+                    steps {
+                        script {
+                            def version = "stable-v1.${BUILD_NUMBER}"
+                            echo "Tagging the build as ${version}"
+
+                            dir('ca6/springApplication') {
+                                // Add a Git tag with the stable naming convention
+                                sh '''
+                                    git config user.name "Jenkins CI"
+                                    git config user.email "jenkins@example.com"
+                                    git tag -a ${version} -m "Stable build ${version}"
+                                    git push origin ${version}
+                                '''
+                            }
+                        }
+                    }
+        }
+
         stage('Deploy to Production?') {
             steps {
                 script {
