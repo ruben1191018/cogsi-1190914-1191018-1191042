@@ -1,0 +1,31 @@
+---
+- name: Deploy and run Spring REST service on host1
+  hosts: all
+  become: true
+  tasks:
+
+    - name: Create application directory
+      file:
+        path: cogsi-1190914-1191018-1191042
+        state: directory
+
+    - name: Clone the repository
+      git:
+        repo: "https://github.com/ruben1191018/cogsi-1190914-1191018-1191042.git"
+        dest: cogsi-1190914-1191018-1191042
+
+    - name: Build REST service with Gradle
+      command: gradle build
+      args:
+        chdir: cogsi-1190914-1191018-1191042/ca2/part2/app
+      register: build_result
+      changed_when: build_result.rc != 0
+      when: 
+        - not build_result is defined
+
+    - name: Start REST service
+      command: sudo gradle bootRun
+      args:
+        chdir: cogsi-1190914-1191018-1191042/ca2/part2/app
+      async: 120
+      poll: 0

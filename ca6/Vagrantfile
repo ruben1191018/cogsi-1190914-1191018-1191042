@@ -1,0 +1,27 @@
+Vagrant.configure("2") do |config|
+
+    config.dns.tld = "mydomain"
+    config.vm.hostname = "mymachine"
+
+    config.vm.box = "bento/ubuntu-20.04"
+    config.vm.synced_folder "./springApplication/h2data", "/home/vagrant/h2data"
+
+    config.vm.provision "ansible" do |ansible|
+        ansible.playbook = "./db_playbook.yml"
+        ansible.compatibility_mode = "2.0"
+    end
+
+    config.vm.provision "ansible" do |ansible|
+        ansible.playbook = "./requirements_app_playbook.yml"
+        ansible.compatibility_mode = "2.0"
+    end
+
+    config.vm.provision "ansible" do |ansible|
+        ansible.playbook = "./app_playbook.yml"
+        ansible.compatibility_mode = "2.0"
+    end
+
+    config.vm.network "forwarded_port", guest: 8080, host: 1010
+
+end
+
