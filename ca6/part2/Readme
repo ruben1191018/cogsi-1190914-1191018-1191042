@@ -29,7 +29,8 @@ In the playbook.yml we do following tasks:
 2. Install Docker: We install docker.
 3. Ensure Docker is running: Check if docker service started.
 4. Log in to Docker registry: We use the credentials to login to docker hub.
-5. Pull the docker image 1191018/cogsi-rest:lastest
-6. Run a container with the previous image.
+5. Stop cogsi application container if it exists
+6. Pull the docker image 1191018/cogsi-rest:lastest
+7. Run a container with the previous image.
 
-![alt text](image.png)
+![alt text](img.png)
