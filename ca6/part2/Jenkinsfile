@@ -1,0 +1,151 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Pulling the latest source code from the repository'
+                checkout scm
+            }
+        }
+
+        stage('Assemble') {
+            steps {
+                dir('ca6/springApplication') {
+                    echo 'Making gradlew executable'
+                    sh 'chmod +x gradlew'
+
+                    echo 'Compiling the code and building artifact files'
+                    sh './gradlew clean build -x test'
+                }
+            }
+        }
+
+        stage('Test') {
+            parallel {
+                stage('Unit Tests') {
+                    agent { label 'unit-test-node' } // Separate node for unit tests
+                    steps {
+                        dir('ca6/springApplication') {
+                            echo 'Making gradlew executable'
+                            sh 'chmod +x gradlew'
+
+                            echo 'Running unit tests'
+                            sh './gradlew test'
+
+                            echo 'Publishing unit test results'
+                            junit '**/build/test-results/test/*.xml'
+                        }
+                    }
+                }
+                stage('Integration Tests') {
+                    agent { label 'integration-test-node' } // Separate node for integration tests
+                    steps {
+                        dir('ca6/springApplication') {
+                            echo 'Making gradlew executable'
+                            sh 'chmod +x gradlew'
+
+                            echo 'Running integration tests'
+                            sh './gradlew integrationTest'
+
+                            echo 'Publishing integration test results'
+                            junit '**/build/test-results/integrationTest/*.xml'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Tag Docker Image') {
+            steps {
+                script {
+                    echo "Building and tagging Docker image with tag:latest"
+                    sh "docker build -t cogsi-rest:latest ."
+                }
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                echo 'Archiving Dockerfile and related metadata'
+                archiveArtifacts artifacts: '**/Dockerfile, **/build/libs/*.jar', allowEmptyArchive: false
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    echo "Pushing Docker image with tag: latest"
+                    withDockerRegistry(credentialsId: 'dockerhub-credentials', url: '1191018/cogsi-rest:latest') {
+                        sh "docker push cogsi-rest:latest"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo 'Deploying the application using Ansible playbooks'
+                dir('ca6') {
+                    ansiblePlaybook(
+                        playbook: 'requirements_app_playbook.yml',
+                        inventory: 'vagrant_inventory'
+                    )
+                    ansiblePlaybook(
+                        playbook: 'db_playbook.yml',
+                        inventory: 'vagrant_inventory'
+                    )
+                    ansiblePlaybook(
+                        playbook: 'app_playbook.yml',
+                        inventory: 'vagrant_inventory'
+                    )
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution completed'
+        }
+        success {
+            echo 'Pipeline succeeded'
+            script {
+                echo 'Running deployment verification health checks'
+
+                def responseCode = sh(
+                    script: "curl -o /dev/null -s -w '%{http_code}' http://192.168.33.10:8080/employees",
+                    returnStdout: true
+                ).trim()
+
+                echo "Health check response code: ${responseCode}"
+
+                if (responseCode != '200') {
+                    error("Health check failed! Application is not healthy.")
+                }
+
+                echo 'Deployment verification completed successfully'
+            }
+
+            // Email notification for success
+            emailext(
+                subject: "Jenkins Pipeline SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "Pipeline execution for ${env.JOB_NAME} succeeded.\n\nBuild URL: ${env.BUILD_URL}",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+            )
+        }
+        failure {
+            echo 'Pipeline failed'
+
+            // Email notification for failure
+            emailext(
+                subject: "Jenkins Pipeline FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "Pipeline execution for ${env.JOB_NAME} failed.\n\nBuild URL: ${env.BUILD_URL}",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+            )
+        }
+    }
+}
