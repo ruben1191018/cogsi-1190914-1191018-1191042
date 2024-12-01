@@ -23,7 +23,7 @@
         state: started
         enabled: true
 
-    # Login to Docker Registry (if required)
+    # Login to Docker Registry
     - name: Log in to Docker registry
       docker_login:
         username: 1191018
@@ -44,5 +44,5 @@
         image: 1191018/cogsi-rest:latest
         state: started
         ports:
-          - "8080:8080"  # Map container's port 80 to VM's port 80
+          - "8080:8080"  # Map container's port 8080 to VM's port 8080
 
