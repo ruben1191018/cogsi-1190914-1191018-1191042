@@ -37,6 +37,13 @@
         tag: latest
         source: pull
 
+    # Stop and remove the old container if it exists
+    - name: Stop cogsi application container if it exists
+      docker_container:
+        name: cogsi_app
+        state: absent  # Ensures the container is stopped and removed
+      ignore_errors: true  # Ignore errors if the container does not exist
+
     # Run the container with the specified image and configuration
     - name: Run the cogsi application container
       docker_container:
