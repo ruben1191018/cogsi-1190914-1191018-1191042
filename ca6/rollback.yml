@@ -1,0 +1,31 @@
+- name: Rollback to stable version
+  hosts: all
+  tasks:
+    - name: Download stable artifact
+      uri:
+        url: "http://localhost:8080/job/part1-pipeline/lastStableBuild/artifact/{{ lookup('env', 'latestBuild') }}"
+        method: GET
+        dest: "/tmp/stable-artifact.jar"
+        headers:
+          Authorization: "Bearer eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmlvIiwic3ViIjoiMTA0NzYxMTEyMix1c2VyMTI0NTU2QGV4YW1wbGUuY29tIiwiZXhwIjoxNzMxNzk2NjQwLCJpYXQiOjE3MzE3NjA2NDAsInJvbGVzIjoiQ2lkYWRhbyJ9.CP0xrBkkyY4k_TzV-_KUqcOnb-THsRUcPrwMqAR7oS0pwIhuXls29ud7bGx6mgqMvQ8sVlfrcIR7nHXpSmXXVZhogqqtKP3lwONSKpCv5HiIzR_srwW_cLcDzY-8Mv_WopcH04fTuaMOCitkQbe6WKL9DHMhLYPchfeTbrFR86ccnPIhLEIC1HDU3dAD0aHIqWG882jC6ZV3rBxhHZASPhSU7DY6QOC1wtaKnT1JxhKxLDNbczNZBA7P1xNuS97D-9QzwkanzycLL8cQ3Ot1p-wmC6C0pbue51os7hMgY_JwrN9VEAmc2jiJcm5rU7ZqjZTLjxa9qyQ50L_osmaLjDTjS6N9zmWsf0MjpkwVzVu6LuXHbybefFiiuPYrAbZYSUvX20ChftU46eU4A5uUc16MYJKFmEHrgcXDRFK8VIMaUElo5RAZ7oPElsFswTg5EIV-pttkiY6muuVSZffWqEHPZ2Bj9RCzRBRSEHHzsSuZl1cUj1lOOuZgbkEHwOcgPMEIE1L-vU4pJ1NEEfTtbphZGJNGybACvsNcj-C-_i7TAXc5vJZc2J-_Xju0IPjRVN0cjeJHz3Puzz2MjxSKdqEgaEdRSuR-Ktsb-U7qFRmKbCFHeSq7jFyiXPWzZv-sR37YSntVViFVZOEnSyMhzBZ6Yio5i3tav54zrmIlc7k"
+    - name: Kill service
+      tasks:
+        - name: Find and kill process on port 8080
+          shell: |
+            kill -9 $(lsof -t -i:8080)
+          ignore_errors: true
+    - name: Start Service
+      command: java -jar /tmp/stable-artifact.jar
+      args:
+        chdir: /tmp
+    - name: Perform health check on the employees service
+      command: >
+        curl -o /dev/null -s -w '%{http_code}' http://192.168.33.10:8080/employees
+      register: health_check_result
+    - name: Print health check result
+      debug:
+        msg: "Health check returned HTTP code: {{ health_check_result.stdout }}"
+    - name: Fail if health check is not successful
+      fail:
+        msg: "Service is down! Received HTTP code: {{ health_check_result.stdout }}"
+      when: health_check_result.stdout != "200"
