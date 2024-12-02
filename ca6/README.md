@@ -23,22 +23,6 @@ We created a Vagrantfile to automate the creation of the VMs:
         # Syncing folders for H2 database persistence
         config.vm.synced_folder "./springApplication/h2data", "/home/vagrant/h2data"
     
-        # Provisioning the VM with Ansible playbooks
-        config.vm.provision "ansible" do |ansible|
-            ansible.playbook = "./db_playbook.yml"
-            ansible.compatibility_mode = "2.0"
-        end
-    
-        config.vm.provision "ansible" do |ansible|
-            ansible.playbook = "./requirements_app_playbook.yml"
-            ansible.compatibility_mode = "2.0"
-        end
-    
-        config.vm.provision "ansible" do |ansible|
-            ansible.playbook = "./app_playbook.yml"
-            ansible.compatibility_mode = "2.0"
-        end
-    
         # Port forwarding to access the Spring application
         config.vm.network "forwarded_port", guest: 8080, host: 1010
     end
@@ -79,6 +63,8 @@ This required configuring Jenkins on our host machine and creating a Jenkinsfile
 
    - We set up a Multibranch Pipeline job to pull code from our repository. This allowed Jenkins to dynamically fetch the latest changes whenever a commit was pushed.
 
+![img.png](part1/img/img20.png)
+
 
 ### Pipeline Stages
 
@@ -99,6 +85,7 @@ This stage pulls the latest code from the Git repository:
 - Uses Jenkins’ built-in checkout scm to pull the latest version of the code from the repository configured in the pipeline job.
 - Ensures that every pipeline execution works with the most up-to-date code.
 
+![img.png](part1/img/img21.png)
 
 #### Assemble
 
@@ -159,6 +146,8 @@ We archived the compiled artifacts in Jenkins for later use and tagged stable bu
 
 Archives the generated .jar files in Jenkins, making them available for deployment or rollback.
 
+![img.png](part1/img/img22.png)
+
 #### Deploy to Production
 
 For production deployment, we added a manual approval step:
@@ -176,6 +165,7 @@ For production deployment, we added a manual approval step:
 
 Pauses the pipeline and waits for a manual approval from an authorized user.
 
+![img.png](part1/img/img23.png)
 
 #### Deploy
 
@@ -242,9 +232,14 @@ To ensure the application is running correctly after deployment.
         }
     }
 
+![img.png](part1/img/img24.png)
+
+
 Uses the curl command to perform a simple HTTP GET request on the application endpoint (/employees).
 Checks if the HTTP status code returned is 200 (OK).
     
+
+![img_1.png](part1/img/img25.png)
 
 - Notifications:
 
