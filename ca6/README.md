@@ -10,10 +10,6 @@ First we created, a vagrant file with the following configuration:
         config.vm.hostname = "production-vm"
     
         config.vm.network "private_network", type: "dhcp"
-    
-        config.vm.provision "ansible" do |ansible|
-            ansible.playbook = "playbook.yml"
-        end
 
         config.vm.network "forwarded_port", guest: 8080, host: 1011
     end
@@ -22,20 +18,7 @@ First we created, a vagrant file with the following configuration:
 * config.vm.box = "bento/ubuntu-20.04": Defines the base image or "box" for the VM.
 * config.vm.hostname = Defines the host name as "production-vm".
 * config.vm.network "private_network", type: "dhcp": Configures the VM's network settings to automatically assigns an IP address to the VM using DHCP.
-* ansible.playbook = "playbook.yml": Indicates the name of the Ansible playbook (playbook.yml) that will be used to configure the VM.
 * config.vm.network "forwarded_port", guest: 8080, host: 1011: Sets up port forwarding to allow access to rest service running inside the VM from the host machine.
-
-In the playbook.yml we do following tasks:
-
-1. Update apt packages: Ensures the system's package index is up to date.
-2. Install Docker: We install docker.
-3. Ensure Docker is running: Check if docker service started.
-4. Log in to Docker registry: We use the credentials to login to docker hub.
-5. Stop cogsi application container if it exists
-6. Pull the docker image 1191018/cogsi-rest:lastest
-7. Run a container with the previous image.
-
-![alt text](part2/img.png)
 
 
 ## Jenkins Pipeline Configuration
@@ -163,7 +146,45 @@ Uses secure credentials (dockerhub-credentials) stored in Jenkins for authentica
     - Pushes the Docker image (cogsi-rest:latest) to the Docker Hub repository.
     - Makes the image publicly or privately available for deployment in other environments.
 
-7. Deploy (Production Deployment)(The same as in the part 1)
+7. Deploy (Production Deployment)
+
+This section is similar to Part 1, but now it deploys just one playbook.
+
+![img.png](img/img.png)
+
+In the playbook.yml we do following tasks:
+
+1. Update apt packages: Ensures the system's package index is up to date.
+2. Install Docker: We install docker.
+3. Ensure Docker is running: Check if docker service started.
+4. Log in to Docker registry: We use the credentials to login to docker hub.
+5. Stop cogsi application container if it exists
+6. Pull the docker image 1191018/cogsi-rest:lastest
+7. Run a container with the previous image.
+
+![alt text](img/img2.png)
+
+
+### Post-Actions
+
+This implementation is similar to Part 1 but now includes a new feature: an email notification 
+section. This section triggers notifications under two conditions: on the successful completion 
+of the pipeline and in the event of a failure. Notifications provide relevant details, such as 
+the pipeline status and a link to the build, ensuring effective communication with developers.
+
+![img3.png](img/img3.png)
+
+The marked section represents the newly implemented features, while the remainder remains consistent with the content from Part 1.
+
+
+### GitHub Webhook Integration
+
+- Configures a webhook in GitHub to trigger the Jenkins pipeline automatically whenever a 
+commit is pushed to the main or development branch.
+- This ensures the CI/CD pipeline always processes the latest changes.
+
+
+
 
 
 ## Alternative Solution for Configuration Management: GitHub Actions
