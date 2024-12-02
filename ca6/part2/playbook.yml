@@ -1,0 +1,55 @@
+---
+- name: Provision VM and deploy cogsi application
+  hosts: all
+  become: true
+
+  tasks:
+    # Update the system package index
+    - name: Update apt packages
+      apt:
+        update_cache: yes
+
+    # Install Docker
+    - name: Install Docker
+      apt:
+        name:
+          - docker.io
+        state: present
+
+    # Start and enable Docker service
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    # Login to Docker Registry
+    - name: Log in to Docker registry
+      docker_login:
+        username: 1191018
+        password: labdsof2024
+        reauthorize: yes
+
+    # Pull the specified Docker image
+    - name: Pull the cogsi Docker image
+      docker_image:
+        name: 1191018/cogsi-rest
+        tag: latest
+        source: pull
+
+    # Stop and remove the old container if it exists
+    - name: Stop cogsi application container if it exists
+      docker_container:
+        name: cogsi_app
+        state: absent  # Ensures the container is stopped and removed
+      ignore_errors: true  # Ignore errors if the container does not exist
+
+    # Run the container with the specified image and configuration
+    - name: Run the cogsi application container
+      docker_container:
+        name: cogsi_app
+        image: 1191018/cogsi-rest:latest
+        state: started
+        ports:
+          - "8080:8080"  # Map container's port 8080 to VM's port 8080
+

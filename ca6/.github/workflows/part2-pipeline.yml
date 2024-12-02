@@ -1,0 +1,182 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Make gradlew executable
+        run: chmod +x ca6/springApplication/gradlew
+
+      - name: Compile and Build Artifacts
+        run: |
+          cd ca6/springApplication
+          ./gradlew clean build -x test
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-type: [unit, integration]
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Make gradlew executable
+        run: chmod +x ca6/springApplication/gradlew
+
+      - name: Run Tests
+        run: |
+          cd ca6/springApplication
+          if [ "${{ matrix.test-type }}" == "unit" ]; then
+            ./gradlew test
+          elif [ "${{ matrix.test-type }}" == "integration" ]; then
+            ./gradlew integrationTest
+          fi
+
+      - name: Publish Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.test-type }}-test-results
+          path: |
+            ca6/springApplication/build/test-results/test/*.xml
+            ca6/springApplication/build/test-results/integrationTest/*.xml
+
+  tag_docker_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t cogsi-rest:latest .
+
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-metadata
+          path: |
+            **/Dockerfile
+            **/build/libs/*.jar
+
+  push_docker_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker Image
+        run: |
+          docker tag cogsi-rest:latest <dockerhub-username>/cogsi-rest:latest
+          docker push <dockerhub-username>/cogsi-rest:latest
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: push_docker_image
+    steps:
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Deploy using Ansible
+        run: |
+          cd ca6/part2
+          ansible-playbook -i vagrant_inventory playbook.yml
+
+  verify_deployment:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Health Check
+        run: |
+          response=$(curl -o /dev/null -s -w "%{http_code}" http://192.168.33.10:8080/employees)
+          if [ "$response" != "200" ]; then
+            echo "Health check failed!"
+            exit 1
+          fi
+          echo "Health check passed with response code: $response"
+
+  notify:
+    needs: [verify_deployment, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Email on Success
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "CI/CD Pipeline SUCCESS: ${{ github.workflow }} #${{ github.run_number }}"
+          body: |
+            Hello Team,
+
+            The CI/CD pipeline has completed successfully.
+
+            Workflow: ${{ github.workflow }}
+            Build Number: ${{ github.run_number }}
+            Repository: ${{ github.repository }}
+            URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Best regards,
+            CI/CD Pipeline
+          to: team@example.com
+
+      - name: Send Email on Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "CI/CD Pipeline FAILURE: ${{ github.workflow }} #${{ github.run_number }}"
+          body: |
+            Hello Team,
+
+            The CI/CD pipeline has failed.
+
+            Workflow: ${{ github.workflow }}
+            Build Number: ${{ github.run_number }}
+            Repository: ${{ github.repository }}
+            URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Please investigate the issue.
+
+            Best regards,
+            CI/CD Pipeline
+          to: team@example.com
