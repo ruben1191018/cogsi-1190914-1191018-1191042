@@ -25,7 +25,7 @@ First we created, a vagrant file with the following configuration:
 
 ### Pipelines Stages
 
-![img.png](img30.png)
+![img.png](../part1/img/img30.png)
 
 This Jenkins pipeline orchestrates the build, test, and deployment processes. Below is the breakdown of its stages:
 
@@ -152,7 +152,7 @@ Uses secure credentials (dockerhub-credentials) stored in Jenkins for authentica
 
 This section is similar to Part 1, but now it deploys just one playbook.
 
-![img.png](img/img.png)
+![img.png](../part1/img/img.png)
 
 In the playbook.yml we do following tasks:
 
@@ -164,7 +164,7 @@ In the playbook.yml we do following tasks:
 6. Pull the docker image 1191018/cogsi-rest:lastest
 7. Run a container with the previous image.
 
-![alt text](img/img2.png)
+![alt text](../part1/img/img2.png)
 
 
 ### Post-Actions
@@ -174,7 +174,7 @@ section. This section triggers notifications under two conditions: on the succes
 of the pipeline and in the event of a failure. Notifications provide relevant details, such as 
 the pipeline status and a link to the build, ensuring effective communication with developers.
 
-![img3.png](img/img3.png)
+![img3.png](../part1/img/img3.png)
 
 The marked section represents the newly implemented features, while the remainder remains consistent with the content from Part 1.
 
