@@ -89,17 +89,9 @@ pipeline {
             }
             steps {
                 echo 'Deploying the application using Ansible playbooks'
-                dir('ca6') {
+                dir('ca6/part2') {
                     ansiblePlaybook(
-                        playbook: 'requirements_app_playbook.yml',
-                        inventory: 'vagrant_inventory'
-                    )
-                    ansiblePlaybook(
-                        playbook: 'db_playbook.yml',
-                        inventory: 'vagrant_inventory'
-                    )
-                    ansiblePlaybook(
-                        playbook: 'app_playbook.yml',
+                        playbook: 'playbook.yml',
                         inventory: 'vagrant_inventory'
                     )
                 }
