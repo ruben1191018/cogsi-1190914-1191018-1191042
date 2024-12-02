@@ -73,7 +73,7 @@ This required configuring Jenkins on our host machine and creating a Jenkinsfile
 
 
 
-    chmod +x gradlew
+        chmod +x gradlew
 
 
 3. Multibranch Pipeline:
