@@ -25,6 +25,8 @@ First we created, a vagrant file with the following configuration:
 
 ### Pipelines Stages
 
+![img.png](img30.png)
+
 This Jenkins pipeline orchestrates the build, test, and deployment processes. Below is the breakdown of its stages:
 
 1. Checkout(The same as in the part 1)
