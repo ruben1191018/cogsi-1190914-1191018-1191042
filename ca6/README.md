@@ -72,7 +72,8 @@ This required configuring Jenkins on our host machine and creating a Jenkinsfile
    - Enabled shell execution permissions for the gradlew script by running:
 
 
-        chmod +x gradlew
+
+    chmod +x gradlew
 
 
 3. Multibranch Pipeline:
