@@ -72,7 +72,7 @@ This required configuring Jenkins on our host machine and creating a Jenkinsfile
    - Enabled shell execution permissions for the gradlew script by running:
 
 
-    chmod +x gradlew
+        chmod +x gradlew
 
 
 3. Multibranch Pipeline:
@@ -84,7 +84,8 @@ This required configuring Jenkins on our host machine and creating a Jenkinsfile
 
 In our Jenkinsfile, we defined several stages to build, test and deploy the application:
 
-1. Checkout
+
+#### Checkout
 
 This stage pulls the latest code from the Git repository:
 
@@ -98,7 +99,8 @@ This stage pulls the latest code from the Git repository:
 - Uses Jenkins’ built-in checkout scm to pull the latest version of the code from the repository configured in the pipeline job.
 - Ensures that every pipeline execution works with the most up-to-date code.
 
-2. Assemble
+
+#### Assemble
 
 We compiled the Spring application and generated the JAR file:
 
@@ -116,7 +118,7 @@ We compiled the Spring application and generated the JAR file:
   - Build the project and generate a .jar artifact (build).
   - Exclude tests from this step (-x test).
 
-3. Test
+#### Test
 
 To ensure code quality, we ran unit tests:
 
@@ -135,7 +137,7 @@ To ensure code quality, we ran unit tests:
 - Executes all unit tests defined in the project using gradlew test.
 - Publishes the test results to Jenkins using the junit step.
 
-4. Archive
+#### Archive
 
 We archived the compiled artifacts in Jenkins for later use and tagged stable builds:
 
@@ -157,7 +159,7 @@ We archived the compiled artifacts in Jenkins for later use and tagged stable bu
 
 Archives the generated .jar files in Jenkins, making them available for deployment or rollback.
 
-5. Deploy to Production
+#### Deploy to Production
 
 For production deployment, we added a manual approval step:
 
@@ -175,7 +177,8 @@ For production deployment, we added a manual approval step:
 Pauses the pipeline and waits for a manual approval from an authorized user.
 
 
-6. Deploy
+#### Deploy
+
 This stage deployed the applications using Ansible playbooks:
 
 
@@ -244,26 +247,29 @@ Checks if the HTTP status code returned is 200 (OK).
     
 
 - Notifications:
+
 Jenkins printed messages indicating the pipeline’s success or failure.
 
 
-    post {
-        always {
-            echo 'Pipeline execution completed'
+        post {
+            always {
+                echo 'Pipeline execution completed'
+            }
+            success {
+                echo 'Pipeline succeeded'
+            }
+            failure {
+                echo 'Pipeline failed'
+            }
         }
-        success {
-            echo 'Pipeline succeeded'
-        }
-        failure {
-            echo 'Pipeline failed'
-        }
-    }
 
 
 ## Adding Rollback Functionality
 To handle deployment failures, we created a rollback mechanism using Ansible. The playbook retrieves the last stable artifact from Jenkins and redeploys it.
 
 ### Rollback Playbook
+
+![img_1.png](img/img4.png)
 
 1. Download Stable Artifact:
 
