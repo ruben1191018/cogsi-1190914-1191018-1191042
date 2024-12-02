@@ -164,3 +164,214 @@ Uses secure credentials (dockerhub-credentials) stored in Jenkins for authentica
     - Makes the image publicly or privately available for deployment in other environments.
 
 7. Deploy (Production Deployment)(The same as in the part 1)
+
+
+## Alternative Solution for Configuration Management: GitHub Actions
+
+GitHub Actions is an automation tool tightly integrated into GitHub's ecosystem, offering robust capabilities for continuous integration and continuous delivery (CI/CD). It enables developers to automate, customize, and execute software development workflows directly in a GitHub repository.
+
+### Comparison of GitHub Actions vs Jenkins
+
+#### Integration and Ecosystem
+
+GitHub Actions:
+
+- Fully integrated with GitHub, offering seamless access to GitHub repositories, issues, and pull requests.
+- Supports GitHub-hosted runners for automation, eliminating the need for separate server setup.
+- Marketplace with thousands of pre-built actions for various tasks (e.g., testing, deployment, monitoring).
+- Best suited for projects already hosted on GitHub.
+
+Jenkins:
+
+- Open-source and platform-agnostic, can be used with a wide variety of repositories and tools.
+- Requires setup and maintenance of a Jenkins server (self-hosted or through a cloud provider).
+- Wide plugin ecosystem, but integration requires additional configuration.
+- Verdict: GitHub Actions is easier to use in GitHub-centric workflows, while Jenkins offers more flexibility for non-GitHub projects.
+
+#### Ease of Use
+GitHub Actions:
+
+- Workflows are defined in YAML files, which are easy to read and version alongside code.
+- Pre-configured GitHub-hosted runners reduce setup time.
+- Low learning curve for developers familiar with GitHub.
+
+Jenkins:
+
+- Configuration can be more complex, requiring knowledge of the Jenkinsfile DSL or GUI configuration.
+- Managing Jenkins servers, pipelines, and plugins adds overhead.
+- Verdict: GitHub Actions offers a more streamlined setup and simpler configuration, especially for GitHub users.
+
+#### Scalability
+
+GitHub Actions:
+
+- Scales via GitHub-hosted runners or self-hosted runners, with resource limits based on GitHub plans.
+- Pricing and resource allocation depend on the repository's subscription level (e.g., free, Team, Enterprise).
+
+Jenkins:
+
+- Completely customizable and scalable based on infrastructure.
+- Resource scaling depends on the hosting environment but requires manual setup.
+- Verdict: Jenkins offers greater scalability for large, complex systems, while GitHub Actions is sufficient for most small-to-medium projects hosted on GitHub.
+
+#### CI/CD Pipeline Features
+
+GitHub Actions:
+
+- Provides reusable workflows, matrix builds, and concurrent jobs.
+- Built-in support for secret management, caching, and artifact handling.
+- Integration with third-party tools via pre-built actions in the Marketplace.
+
+Jenkins:
+
+- Highly customizable pipelines through plugins.
+- Supports parallelism and declarative/imperative pipeline styles.
+- Extensive range of plugins for customization, which may occasionally introduce compatibility issues.
+- Verdict: GitHub Actions simplifies CI/CD pipeline setup with pre-built integrations, while Jenkins offers deeper customization for advanced use cases.
+
+#### Cost
+
+GitHub Actions:
+
+- Free for public repositories and limited workflows on private repositories (e.g., 2,000 minutes per month for free plans).
+- Costs can rise with extensive usage of GitHub-hosted runners on private repositories.
+
+Jenkins:
+
+- Open-source and free, but operational costs (e.g., hosting, maintenance) are incurred based on infrastructure.
+- Verdict: GitHub Actions is cost-effective for small teams, while Jenkins may be more economical for large teams with self-hosted infrastructure.
+
+#### Conclusion
+
+GitHub Actions is ideal for projects already hosted on GitHub, offering ease of use, tight integration, and sufficient CI/CD capabilities for small to medium projects. It shines in environments where simplicity and GitHub-native workflows are priorities.
+
+Jenkins remains a more flexible and powerful tool for larger, complex projects that require custom setups, extensive plugin support, and integration across diverse environments.
+
+For most GitHub-based projects, GitHub Actions would be the preferred solution due to its simplicity, ease of use, and cost-effectiveness. However, for organizations seeking complete control over their CI/CD pipelines, Jenkins might still be the better option.
+
+
+
+## Implementation with the alternative: Github Actions
+
+For the alternative implemention we used github actions and created the yml files inside the .github/workflows directory
+
+## Part 1
+For the first part use used the part1-pipeline.yml.
+
+- Workflow Trigger
+  - Triggers:
+  
+
+    push: Executes the pipeline when code is pushed to the repository.
+    workflow_dispatch: Allows manual triggering of the workflow.
+
+
+### Pipeline stages
+
+1. Checkout: 
+
+   Purpose: Fetches the repository code.
+
+   Actions: Utilizes actions/checkout@v3 to clone the repository for subsequent operations.
+
+
+2. Assemble: 
+
+Purpose: Builds the application and generates artifacts.
+
+Actions:
+- Sets up Java 17 using actions/setup-java@v3.
+- Ensures gradlew script is executable.
+- Compiles the application and builds the project while skipping tests (gradlew clean build -x test).
+
+
+3. Test
+
+ Purpose: Runs unit tests to verify code correctness. 
+ 
+Actions:
+   
+   - Re-checks out the repository and sets up Java 17.
+   - Executes gradlew test to run tests.
+   - Uploads test results as artifacts for review (actions/upload-artifact@v3).
+
+4. Archive
+
+Purpose: Archives the built artifacts for deployment.
+
+Actions:
+   - Renames the built JAR file with a version tag (app-stable-v1.<run_number>.jar).
+   - Uploads the renamed artifacts using actions/upload-artifact@v3.
+
+
+5. Deploy to Production
+   
+Purpose: Introduces a manual approval gate for production deployment.
+
+Actions:
+
+   - Prompts the user for manual approval to proceed with the deployment.
+
+6. Deploy
+
+Purpose: Deploys the application using Ansible.
+
+Actions:
+
+   - Installs Ansible on the runner.
+   - Executes three Ansible playbooks (requirements_app_playbook.yml, db_playbook.yml, and app_playbook.yml) to configure and deploy the application to a Vagrant-based environment.
+
+7. Verify Deployment
+
+Purpose: Performs a health check to confirm successful deployment.
+
+Actions:
+
+   - Uses curl to verify that the application is running correctly by checking for an HTTP 200 response at http://192.168.33.10:8080/employees.
+   - Fails the pipeline if the health check does not return a successful status.
+
+
+## Part 2
+
+# **CI/CD Pipeline Workflow Summary**
+
+For the second part use used the part2-pipeline.yml.
+
+This workflow automates the CI/CD process for building, testing, deploying, and verifying an application, with email notifications for pipeline success or failure.
+
+## **Workflow Steps**
+
+### 1. **Checkout**
+- Pulls the source code from the repository.
+
+### 2. **Assemble**
+- Sets up Java 17.
+- Makes the `gradlew` script executable.
+- Compiles and builds the project, excluding tests.
+
+### 3. **Test**
+- Runs both unit and integration tests in parallel.
+- Publishes the test results as artifacts.
+
+### 4. **Tag Docker Image**
+- Builds a Docker image and tags it.
+
+### 5. **Archive**
+- Archives Docker-related metadata and built artifacts.
+
+### 6. **Push Docker Image**
+- Pushes the Docker image to DockerHub.
+
+### 7. **Deploy**
+- Deploys the application using Ansible playbooks.
+- This step runs only for the `main` branch.
+
+### 8. **Verify Deployment**
+- Runs health checks to ensure the application is functioning correctly.
+
+### 9. **Notification**
+- Sends an email notification for pipeline success or failure.
+- Includes details like workflow name, build number, and repository URL.
+
+
+
