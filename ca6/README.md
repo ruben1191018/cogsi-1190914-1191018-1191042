@@ -56,6 +56,7 @@ This required configuring Jenkins on our host machine and creating a Jenkinsfile
    - Enabled shell execution permissions for the gradlew script by running:
 
 
+
         chmod +x gradlew
 
 
@@ -264,7 +265,7 @@ To handle deployment failures, we created a rollback mechanism using Ansible. Th
 
 ### Rollback Playbook
 
-![img_1.png](img/img4.png)
+![img_1.png](part1/img/img4.png)
 
 1. Download Stable Artifact:
 
